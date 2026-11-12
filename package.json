@@ -1,0 +1,15 @@
+{
+  "name": "full-stack-estate",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "concurrently \"npm run dev -C client\" \"npm run dev -C api\"",
+    "install:client": "cd client && npm install",
+    "install:api": "cd api && npm install",
+    "install": "npm install:client && npm install:api",
+    "build": "npm run build -C client"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

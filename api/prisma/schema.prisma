@@ -1,0 +1,266 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+
+  // -----------------------------
+  // المعلومات الأساسية
+  // -----------------------------
+  title       String?
+  price       Int?
+  type        PostType
+  property    PropertyType
+
+  city         String
+  neighborhood String?
+
+  description String?
+
+  // -----------------------------
+  // مواصفات العقار
+  // -----------------------------
+  rooms        Rooms?
+  bathrooms    Int?
+
+  floor             Int?
+  buildingFloors    Int?
+  facades           Int?
+
+  propertyCondition  PropertyCondition?
+  constructionStatus ConstructionStatus?
+  ownershipDocuments OwnershipDocument[]
+  buildingMaterial   BuildingMaterial?
+
+  // ✅ كلها nullable بدون default: null = "الحقل غير منطبق على هذا الإعلان"
+  furnished   Boolean?
+  garage      Boolean?
+  gas         Boolean?
+  waterTank   Boolean?
+  terrace     Boolean? // سطح / تيراس
+  electricity Boolean?
+  sewage      Boolean?
+  constructionYear Int?
+
+  // -----------------------------
+  // الإيجار
+  // -----------------------------
+  rentPeriod  RentPeriod?
+
+  // -----------------------------
+  // الموقع والأبعاد
+  // -----------------------------
+  latitude    Float?
+  longitude   Float?
+
+  width       Float?
+  length      Float?
+  area        Float?   // ✅ جديد: المساحة المحسوبة (width × length)
+  hectares    Float?
+
+  // -----------------------------
+  // التواصل
+  // -----------------------------
+  phones      String[]
+
+  // -----------------------------
+  // النظام
+  // -----------------------------
+  status      String @default("ACTIVE")
+
+  images      String[]
+  video       String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User @relation(fields: [userId], references: [id])
+
+  comments Comment[]
+  views       PostView[]
+  savedPosts  SavedPost[]
+
+  @@map("Post")
+}
+
+enum PropertyCondition {
+  NEW
+  LIKE_NEW
+  OLD
+}
+
+enum ConstructionStatus {
+  FINISHED
+  ALMOST_FINISHED
+  HALF_FINISHED
+  STRUCTURE
+  OTHER
+}
+
+enum OwnershipDocument {
+  TITLE_DEED             // عقد الملكية
+  LAND_BOOK              // الدفتر العقاري
+  URBAN_CERTIFICATE      // شهادة التعمير
+  NEGATIVE_CERTIFICATE   // شهادة السلبية (عدم وجود رهون)
+  BUILDING_PERMIT        // رخصة البناء
+  CONFORMITY_CERTIFICATE // شهادة المطابقة
+  CUSTOM                 // عقد عرفي
+  OTHER                  // وثائق أخرى
+}
+
+enum BuildingMaterial {
+  CONCRETE
+  PLASTER
+  MIXED
+}
+
+model PostView {
+  id        String   @id @default(cuid()) @map("_id")
+  postId    String
+  userId    String? // nullable لو زائر غير مسجل
+  ipAddress String? // للزوار
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id])
+  @@map("PostView")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Reviews {
+  id        String   @id @default(cuid()) @map("_id")
+  postId    String
+  userId    String
+  rating    String
+  comment   String
+  createdAt DateTime @default(now())
+  @@map("Reviews")
+}
+
+model SiteVisit {
+  id         String   @id @default(cuid()) @map("_id")
+  visitorId  String
+  userId     String?
+  ipAddress  String?
+  userAgent  String?
+  deviceType String?  // mobile | desktop | tablet
+  browser    String?
+  os         String?
+  createdAt  DateTime @default(now())
+}
+
+model User {
+  id          String      @id @default(cuid()) @map("_id")
+  clerkId     String      @unique
+  username    String      @unique
+  email       String?     @unique
+  avatar      String?
+  role        Role        @default(USER)
+  banned      Boolean     @default(false)
+  posts       Post[]
+  savedPosts  SavedPost[]
+  lastLoginAt DateTime?
+  createdAt   DateTime    @default(now())
+  comments  Comment[]
+  @@map("User")
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  postId String @db.ObjectId
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  parentId String?   @db.ObjectId
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies  Comment[] @relation("CommentReplies")
+
+  @@index([postId])
+  @@index([userId])
+  @@index([parentId])
+}
+
+model SavedPost {
+  id        String   @id @default(cuid()) @map("_id")
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
+  @@unique([userId, postId])
+  @@map("SavedPost")
+}
+
+// ---- ENUMS ----
+
+enum PostType {
+  buy
+  rent
+}
+
+enum PropertyType {
+  apartment        // شقة سكنية
+  residence        // سكنة فردية
+  arabic_house     // حوش عربي / جبس
+  villa            // فيلا
+  building         // عمارة
+  land             // أرض للبناء
+  farm_land        // أرض فلاحية
+  garden           // حويطة / قطعة صغيرة
+
+  shop             // محل تجاري
+  office           // مكتب
+  garage           // كراج
+  warehouse        // مستودع / مخزن
+  factory          // مصنع
+
+  chalet           // شاليه / استراحة
+  farm             // مزرعة كاملة
+
+  other            // أخرى
+}
+
+enum Rooms {
+  STUDIO
+  F1
+  F2
+  F3
+  F4
+  F5
+  F6
+  F7
+  F8
+}
+
+enum RentPeriod {
+  daily
+  weekly
+  monthly
+  yearly
+}
+
+model AuditLog {
+  id        String   @id @default(cuid()) @map("_id")
+  userId    String
+  action    String
+  entity    String
+  entityId  String
+  createdAt DateTime @default(now())
+}
