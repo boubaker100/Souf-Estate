@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { LayoutTextFlip } from "../ui/layout-text-flip"
 import { Highlight } from "../ui/hero-highlight"
 import { HoverBorderGradient } from "../ui/hover-border-gradient"
@@ -113,18 +113,14 @@ const elOuedCommunes = [
     <div className={`shadow-2xl relative w-full h-screen overflow-hidden  ${className}`}>
       {/* Slides Container */}
       
-      <AnimatePresence   mode="wait">
-        {images.length > 0 && (
 <motion.img
-               
-               className=" absolute inset-0 w-full h-screen object-cover kenburns-top"
-               key={images[currentImageIndex]}
-               src={images[currentImageIndex]}
-               onError={(e) => { e.currentTarget.src = "/souf.png"; }}
+                fetchpriority="high"
+                loading="eager"
+                className=" absolute inset-0 w-full h-screen object-cover kenburns-top"
+                key={images[currentImageIndex]}
+                src={images[currentImageIndex]}
+                onError={(e) => { e.currentTarget.src = "/souf.png"; }}
               />
-        
-        )}
-      </AnimatePresence>
  
       <div className=" absolute w-full h-50 top-0  bg-gradient-to-b from-black/100 " />
     
