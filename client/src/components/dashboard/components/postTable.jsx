@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { getImageUrl } from "@/lib/getImageUrl"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import { DataGrid } from "@/components/reui/data-grid/data-grid"
@@ -319,7 +320,7 @@ export function PostsTable() {
       ),
       cell: ({ row }) => {
         const post = row.original
-        const img  = post.images?.[0]
+        const img  = getImageUrl(post.images)
         return (
           <button
             type="button"
@@ -328,7 +329,7 @@ export function PostsTable() {
           >
             <div className="bg-muted size-10 shrink-0 overflow-hidden rounded-md">
               {img
-                ? <img src={img} alt={post.title} className="size-full object-cover" />
+                ? <img src={img} alt={post.title} className="size-full object-cover" onError={(e) => { e.currentTarget.src = "/souf.png"; }} />
                 : <div className="text-muted-foreground flex size-full items-center justify-center text-xs">—</div>
               }
             </div>

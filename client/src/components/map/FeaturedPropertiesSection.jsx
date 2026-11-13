@@ -2,6 +2,7 @@ import { motion } from "framer-motion"
 import { Star, ArrowRight, TrendingUp } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
+import { getImageUrl } from "@/lib/getImageUrl"
 
 export default function FeaturedPropertiesSection({ properties = [] }) {
   // أفضل العقارات (يمكن الحصول عليها من API أو بناءً على التقييم)
@@ -77,9 +78,10 @@ export default function FeaturedPropertiesSection({ properties = [] }) {
                 {/* الصورة */} 
                 <div className="relative h-56 bg-gradient-to-br from-gray-300 to-gray-400 overflow-hidden">
                   <img
-                    src={property.images?.[0] || "/placeholder.jpg"}
+                    src={getImageUrl(property.images)}
                     alt={property.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    onError={(e) => { e.currentTarget.src = "/souf.png"; }}
                   />
 
                   {/* النجمة الذهبية */}

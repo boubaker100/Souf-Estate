@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getImageUrl } from "@/lib/getImageUrl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { formatDistanceToNowStrict } from "date-fns";
@@ -89,7 +90,7 @@ export default function PropertyCard({ post, isOwner = false, onDelete }) {
   const images =
     post.images && post.images.length > 0
       ? post.images
-      : ["https://placehold.co/600x400?text=No+Image"];
+      : [getImageUrl(null)];
   const isRent = post.type === "rent";
   const primaryPhone =
     Array.isArray(post.phones) && post.phones.length > 0
@@ -222,12 +223,13 @@ export default function PropertyCard({ post, isOwner = false, onDelete }) {
         <AnimatePresence mode="wait">
           <motion.img
             key={currentImageIndex}
-            src={images[currentImageIndex]}
+            src={getImageUrl(images[currentImageIndex])}
             alt={post.title}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="w-full h-full object-cover"
+            onError={(e) => { e.currentTarget.src = "/souf.png"; }}
           />
         </AnimatePresence>
 

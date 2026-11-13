@@ -23,15 +23,15 @@ import { useAuth } from "@clerk/clerk-react"
 
 export default function HeroTemplate({
     images=[
-          "../../../public/4.jpg",
-          "../../../public/3.png",
-          "../../../public/2.png",
-          "../../../public/10.png",
-          "../../../public/8.png",
-          "../../../public/6.png",
-          "../../../public/9.png",
-          "../../../public/5.png",
-          "../../../public/1.png",
+          "/4.jpg",
+          "/3.png",
+          "/2.png",
+          "/10.png",
+          "/8.png",
+          "/6.png",
+          "/9.png",
+          "/5.png",
+          "/1.png",
 
          
   ],
@@ -115,12 +115,13 @@ const elOuedCommunes = [
       
       <AnimatePresence   mode="wait">
         {images.length > 0 && (
-              <motion.img
-              
-              className=" absolute inset-0 w-full h-screen object-cover kenburns-top"
-              key={images[currentImageIndex]}
-              src={images[currentImageIndex]}
-             />
+<motion.img
+               
+               className=" absolute inset-0 w-full h-screen object-cover kenburns-top"
+               key={images[currentImageIndex]}
+               src={images[currentImageIndex]}
+               onError={(e) => { e.currentTarget.src = "/souf.png"; }}
+              />
         
         )}
       </AnimatePresence>

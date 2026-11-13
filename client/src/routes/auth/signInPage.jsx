@@ -44,6 +44,7 @@ function SignInPage() {
             exit={{ opacity: 0 }}
             transition={{ duration: 1 }}
             className="absolute inset-0 w-full h-full object-cover z-0"
+            onError={(e) => { e.currentTarget.src = "/souf.png"; }}
           />
         )}
       </AnimatePresence>

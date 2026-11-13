@@ -2,6 +2,7 @@ import { useState } from "react";
 import StatusBadge from "./StatusBadge";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 export default function DashboardCard({ post, onDelete }) {
   const [open, setOpen] = useState(false);
@@ -9,7 +10,7 @@ export default function DashboardCard({ post, onDelete }) {
   return (
     <motion.div whileHover={{ y: -4 }} className="bg-white dark:bg-gray-950 rounded-2xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-800 flex flex-col">
       <div className="relative h-44 w-full">
-        <img src={post.images?.[0] || "/noimage.jpg"} alt={post.title} className="w-full h-full object-cover" />
+        <img src={getImageUrl(post.images)} alt={post.title} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = "/souf.png"; }} />
         <div className="absolute top-3 left-3">
           <StatusBadge status={post.status} />
         </div>
