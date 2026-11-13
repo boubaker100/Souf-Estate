@@ -33,7 +33,13 @@ const allowedOrigins = process.env.CLIENT_URL
 const allowCredentials = allowedOrigins[0] !== "*";
 
 
-// ── CORS ─────────────────────────────────────────────────────
+// CORS origins: allow all if not configured (deployment convenience)
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(",").map((o) => o.trim())
+  : ["*"];
+
+// If wildcard is used, disable credentials (browser restriction)
+const allowCredentials = allowedOrigins[0] !== "*";
 
 app.use(
   cors({
