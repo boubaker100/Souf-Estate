@@ -75,6 +75,17 @@ export function buildPostData(body, existing = null) {
     return isCreate ? null : existing[key];
   };
 
+  // السعر: يُ ALWAYS يكون عددًا غير سالب (0 عند الفراغ) لتجنب split price:0 / price:null
+  const toPrice = (body, isCreate, existing) => {
+    const raw = body.price;
+    if (raw === undefined || raw === null || raw === "") {
+      return isCreate ? 0 : (existing?.price ?? 0);
+    }
+    const n = Number(raw);
+    if (Number.isNaN(n) || n < 0) return 0;
+    return Math.floor(n);
+  };
+
   // الهواتف
   let phones = isCreate ? [] : existing.phones;
   if (Array.isArray(body.phones)) phones = body.phones.filter(Boolean);
@@ -124,7 +135,7 @@ export function buildPostData(body, existing = null) {
 
   return {
     title: raw("title"),
-    price: num("price"),
+    price: toPrice(body, isCreate, existing),
     type: raw("type"),
     property: raw("property"),
     city: typeof body.city === 'string' ? body.city : null,
