@@ -3,6 +3,7 @@ import StatusBadge from "./StatusBadge";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { getImageUrl } from "@/lib/getImageUrl";
+import { formatPrice } from "@/lib/formatPrice";
 
 export default function DashboardCard({ post, onDelete }) {
   const [open, setOpen] = useState(false);
@@ -10,13 +11,13 @@ export default function DashboardCard({ post, onDelete }) {
   return (
     <motion.div whileHover={{ y: -4 }} className="bg-white dark:bg-gray-950 rounded-2xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-800 flex flex-col">
       <div className="relative h-44 w-full">
-        <img src={getImageUrl(post.images)} alt={post.title} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = "/souf.png"; }} />
+        <img src={getImageUrl(post.images)} alt={post.title} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = "/souf.webp"; }} />
         <div className="absolute top-3 left-3">
           <StatusBadge status={post.status} />
         </div>
         <div className="absolute top-3 right-3">
           <div className="relative">
-            <button onClick={() => setOpen((s) => !s)} className="px-2 py-1 rounded-md bg-white/80 dark:bg-gray-800/80">•••</button>
+            <button onClick={() => setOpen((s) => !s)} className="px-2 py-1 rounded-md bg-white/80 dark:bg-gray-800/80" aria-label="المزيد">•••</button>
 
             {open && (
               <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-900 rounded-md shadow-lg border">
@@ -35,7 +36,7 @@ export default function DashboardCard({ post, onDelete }) {
 
         <div className="mt-3 flex items-center justify-between">
           <div>
-            <div className="text-xl font-bold text-indigo-600">{post.price.toLocaleString()} دج</div>
+            <div className="text-xl font-bold text-indigo-600">{formatPrice(post.price)}</div>
             <div className="text-sm text-gray-500">{post.rooms} • {post.property}</div>
           </div>
 

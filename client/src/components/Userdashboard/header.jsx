@@ -45,7 +45,7 @@ export default function DashboardHeader({ role, onMenuClick }) {
       <div className="flex items-center gap-4">
 
         {/* Notifications */}
-        <button className="relative">
+        <button className="relative" aria-label="الnotifications">
           <Bell size={20} />
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
             3
@@ -53,7 +53,7 @@ export default function DashboardHeader({ role, onMenuClick }) {
         </button>
 
         {/* Theme Toggle */}
-        <button onClick={toggleTheme}>
+        <button onClick={toggleTheme} aria-label="تبernel المظهر">
           {dark ? <Sun size={20} /> : <Moon size={20} />}
         </button>
 

@@ -8,15 +8,15 @@ function SignInPage() {
 
   // تم تصحيح مسارات الصور لتشير إلى مجلد public بشكل صحيح
   const images = [
-    "/4.jpg",
-    "/3.png",
-    "/2.png",
-    "/10.png",
-    "/8.png",
-    "/6.png",
-    "/9.png",
-    "/5.png",
-    "/1.png",
+    "/4.webp",
+    "/3.webp",
+    "/2.webp",
+    "/10.webp",
+    "/8.webp",
+    "/6.webp",
+    "/9.webp",
+    "/5.webp",
+    "/1.webp",
   ];
 
   useEffect(() => {
@@ -44,7 +44,7 @@ function SignInPage() {
             exit={{ opacity: 0 }}
             transition={{ duration: 1 }}
             className="absolute inset-0 w-full h-full object-cover z-0"
-            onError={(e) => { e.currentTarget.src = "/souf.png"; }}
+            onError={(e) => { e.currentTarget.src = "/souf.webp"; }}
           />
         )}
       </AnimatePresence>

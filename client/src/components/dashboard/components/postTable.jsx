@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { getImageUrl } from "@/lib/getImageUrl"
+import { formatPrice } from "@/lib/formatPrice"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import { DataGrid } from "@/components/reui/data-grid/data-grid"
@@ -56,11 +57,6 @@ const DEFAULT_FILTERS = {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-const formatPrice = (price) =>
-  !price && price !== 0
-    ? "—"
-    : new Intl.NumberFormat("ar-DZ").format(price) + " دج"
 
 const formatDate = (date) =>
   new Date(date).toLocaleDateString("en-GB", {
@@ -329,7 +325,7 @@ export function PostsTable() {
           >
             <div className="bg-muted size-10 shrink-0 overflow-hidden rounded-md">
               {img
-                ? <img src={img} alt={post.title} className="size-full object-cover" onError={(e) => { e.currentTarget.src = "/souf.png"; }} />
+                ? <img src={img} alt={post.title} className="size-full object-cover" onError={(e) => { e.currentTarget.src = "/souf.webp"; }} />
                 : <div className="text-muted-foreground flex size-full items-center justify-center text-xs">—</div>
               }
             </div>

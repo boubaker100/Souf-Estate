@@ -53,7 +53,7 @@ export default function ContactPage() {
     <div className="relative bg-black text-white pt-28 pb-16 px-4 sm:px-6 overflow-hidden">
       {/* الصورة كخلفية */}
       <img
-        src="/2.png"
+        src="/2.webp"
         alt="Contact"
         className="absolute inset-0 w-full h-full object-cover z-0"
       />

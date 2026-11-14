@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { rentIcon, buyIcon } from "./mapIcons";
 import { Link } from "react-router-dom";
 import { Phone } from "lucide-react";
+import { formatPrice } from "@/lib/formatPrice";
 
 // إعداد أيقونات Leaflet الافتراضية
 delete L.Icon.Default.prototype._getIconUrl;
@@ -55,12 +56,6 @@ const PROPERTY_LABELS = {
 };
 
 const RENT_PERIOD_SUFFIX = { daily: "/يوم", monthly: "/شهر", yearly: "/سنة" };
-
-const formatDZD = (value) => {
-  const digits = String(value ?? "").replace(/\D/g, "");
-  if (!digits) return "0";
-  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-};
 
 export default function PostsMap({
   posts,
@@ -125,12 +120,7 @@ export default function PostsMap({
                     {/* السعر — العنصر الأهم، بحجم أكبر وثقل بصري واضح */}
                     <div className="flex items-baseline gap-1.5 border-b border-gray-100 pb-3">
                       <span className="text-2xl font-black text-gray-900 leading-none">
-                        {post.price && post.price > 0
-                          ? formatDZD(post.price)
-                          : "السعر عند الطلب"}
-                      </span>
-                      <span className="text-sm font-semibold text-gray-400">
-                        دج
+                        {formatPrice(post.price)}
                       </span>
                       {isRent && post.rentPeriod && (
                         <span className="text-xs font-medium text-gray-400">

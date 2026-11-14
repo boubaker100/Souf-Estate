@@ -1,14 +1,15 @@
- import { 
-  MapPin, 
-  Home, 
-  DollarSign, 
-  Phone, 
-  Maximize, 
-  Armchair, 
-  Calendar, 
-  Tag, 
-  Building2 
+import {
+  MapPin,
+  Home,
+  DollarSign,
+  Phone,
+  Maximize,
+  Armchair,
+  Calendar,
+  Tag,
+  Building2
 } from "lucide-react";
+import { formatPrice } from "@/lib/formatPrice";
 
 const PropertyDetails = ({ post }) => {
   
@@ -49,7 +50,7 @@ const PropertyDetails = ({ post }) => {
     { 
       label: "السعر:", 
       icon: <DollarSign className="text-yellow-600" />, 
-      text: `${post.price?.toLocaleString()} دج`, 
+      text: formatPrice(post.price), 
       bold: true 
     },
 

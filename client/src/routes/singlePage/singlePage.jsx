@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import { Maximize2, X } from "lucide-react";
 import apiRequest from "../../lib/apiRequest";
+import { formatPrice } from "@/lib/formatPrice";
 import PostsMap from "@/components/map/PostsMap";
 import ImageCarousel from "@/components/carousel-09";
 import CommentSection from "@/components/comments/CommentSection";
@@ -70,12 +71,6 @@ const hasValue = (v) => {
 };
 
 const isYes = (v) => v === "yes" || v === true || v === "true";
-
-const formatDZD = (value) => {
-  const digits = String(value ?? "").replace(/\D/g, "");
-  if (!digits) return "0";
-  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-};
 
 function SinglePage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -155,64 +150,64 @@ function SinglePage() {
   // وبنفس استثناءات الأراضي المطبّقة في PropertyCard.jsx (لا معنى لعرض
   // "عدد الغرف" أو "الطابق" على قطعة أرض فارغة).
   const quickSpecs = [
-    { icon: "/utility.png", title: "نوع العقار", value: propertyLabel },
+    { icon: "/utility.webp", title: "نوع العقار", value: propertyLabel },
     {
-      icon: "/bed.png",
+      icon: "/bed.webp",
       title: "التصميم الداخلي",
       value: !isBareLand && hasValue(post.rooms) ? post.rooms : null,
     },
     {
-      icon: "/pet.png",
+      icon: "/pet.webp",
       title: "عدد الحمامات",
       value: !isBareLand && hasValue(post.bathrooms) ? `${post.bathrooms}` : null,
     },
-    { icon: "/size.png", title: "المساحة", value: getAreaValue() },
+    { icon: "/size.webp", title: "المساحة", value: getAreaValue() },
     {
-      icon: "/size.png",
+      icon: "/size.webp",
       title: "رقم الطابق",
       value: !isBareLand && hasValue(post.floor) ? `${post.floor}` : null,
     },
     {
-      icon: "/utility.png",
+      icon: "/utility.webp",
       title: "عدد الطوابق",
       value: !isBareLand && hasValue(post.buildingFloors) ? `${post.buildingFloors}` : null,
     },
     {
-      icon: "/size.png",
+      icon: "/size.webp",
       title: "عدد الواجهات",
       value: !isBareLand && hasValue(post.facades) ? `${post.facades}` : null,
     },
     {
-      icon: "/utility.png",
+      icon: "/utility.webp",
       title: "سنة البناء",
       value: !isBareLand && hasValue(post.constructionYear) ? `${post.constructionYear}` : null,
     },
     {
-      icon: "/pet.png",
+      icon: "/pet.webp",
       title: "التأثيث",
       value: !isBareLand && isYes(post.furnished) ? "مؤثث" : null,
     },
     {
-      icon: "/fee.png",
+      icon: "/fee.webp",
       title: "مدة الكراء",
       value: isRent && hasValue(post.rentPeriod) ? RENT_PERIOD_LABELS[post.rentPeriod] || post.rentPeriod : null,
     },
     {
-      icon: "/utility.png",
+      icon: "/utility.webp",
       title: "حالة العقار",
       value: hasValue(post.propertyCondition)
         ? CONDITION_LABELS[post.propertyCondition] || post.propertyCondition
         : null,
     },
     {
-      icon: "/utility.png",
+      icon: "/utility.webp",
       title: "حالة البناء",
       value: !isBareLand && hasValue(post.constructionStatus)
         ? BUILD_CONDITION_LABELS[post.constructionStatus] || post.constructionStatus
         : null,
     },
     {
-      icon: "/utility.png",
+      icon: "/utility.webp",
       title: "بنية العقار",
       value: !isBareLand && hasValue(post.buildingMaterial)
         ? STRUCTURE_LABELS[post.buildingMaterial] || post.buildingMaterial
@@ -250,7 +245,7 @@ function SinglePage() {
             {/* بطاقة المعلن */}
             <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl mb-8 border border-gray-100">
               <img
-                src={post.user?.avatar || "/noavatar.jpg"}
+                src={post.user?.avatar || "/noavatar.webp"}
                 alt="user"
                 className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm"
               />
@@ -281,7 +276,7 @@ function SinglePage() {
                 {/* الموقع */}
                 <div className="flex items-center gap-2 text-gray-500 font-medium">
                   <img
-                    src="/pin.png"
+                    src="/pin.webp"
                     alt="location"
                     className="w-4 h-4 opacity-70"
                   />
@@ -301,7 +296,7 @@ function SinglePage() {
                           : " text-gray-600 bg-gray-50 border-gray-300 hover:bg-gray-200"
                       }`}
                     >
-                      <img src="/phone.png" alt="phone" className="w-4 h-4 " />
+                      <img src="/phone.webp" alt="phone" className="w-4 h-4 " />
                       {copied ? "تم النسخ ! " : primaryPhone}
                     </button>
                   </div>
@@ -309,7 +304,7 @@ function SinglePage() {
               </div>
 
               <div className="text-2xl font-bold text-lime-700 bg-lime-50 px-4 py-2 rounded-xl border border-lime-100 whitespace-nowrap">
-                {formatDZD(post.price)} دج
+                {formatPrice(post.price)}
                 {isRent && post.rentPeriod && (
                   <span className="text-sm font-medium text-lime-600">
                     {RENT_PERIOD_SUFFIX[post.rentPeriod] || ""}

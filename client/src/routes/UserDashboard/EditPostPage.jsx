@@ -515,6 +515,7 @@ sewage: showSewage ? formData.sewage : null,
                       style={{ lineHeight: "1.7" }}
                       className=" w-full border-gray-300 font-medium"
                     />
+                    <p className="text-xs text-gray-500 mt-1">اتركه فارغًا أو 0 إذا كان السعر عند الطلب</p>
                   </div>
                 </div>
 

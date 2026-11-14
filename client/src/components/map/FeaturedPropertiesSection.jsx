@@ -3,6 +3,7 @@ import { Star, ArrowRight, TrendingUp } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { getImageUrl } from "@/lib/getImageUrl"
+import { formatPrice } from "@/lib/formatPrice"
 
 export default function FeaturedPropertiesSection({ properties = [] }) {
   // أفضل العقارات (يمكن الحصول عليها من API أو بناءً على التقييم)
@@ -81,7 +82,7 @@ export default function FeaturedPropertiesSection({ properties = [] }) {
                     src={getImageUrl(property.images)}
                     alt={property.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    onError={(e) => { e.currentTarget.src = "/souf.png"; }}
+                    onError={(e) => { e.currentTarget.src = "/souf.webp"; }}
                   />
 
                   {/* النجمة الذهبية */}
@@ -108,11 +109,7 @@ export default function FeaturedPropertiesSection({ properties = [] }) {
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="text-3xl font-bold text-yellow-600">
-                        {new Intl.NumberFormat("ar-DZ", {
-                          style: "currency",
-                          currency: "DZD",
-                          minimumFractionDigits: 0,
-                        }).format(property.price)}
+                        {formatPrice(property.price)}
                       </p>
                       {property.type === "rent" && (
                         <p className="text-sm text-gray-500">

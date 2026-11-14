@@ -79,8 +79,8 @@ export default function Navbar() {
       <div className="flex items-center justify-between h-12">
         <div className="flex shrink-0">
           <Link to="/" className="flex items-center h-10">     
-            {isFixed ?  <img src="../../../LOGO4.png" className="w-auto h-full" alt="Logo" /> 
-            :            <img src="../../../LOGO3.png" className="w-auto h-full" alt="Logo" /> }
+            {isFixed ?  <img src="../../../LOGO4.webp" className="w-auto h-full" alt="Logo" /> 
+            :            <img src="../../../LOGO3.webp" className="w-auto h-full" alt="Logo" /> }
           </Link>
         </div>
 
@@ -232,7 +232,7 @@ export default function Navbar() {
             >
               <div className="flex items-center justify-between p-4 border-b border-white/10">
                 <h3 className="text-white font-bold">القائمة</h3>
-                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-white"><X className="w-6 h-6" /></button>
+                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-white" aria-label="إغلاق القائمة"><X className="w-6 h-6" /></button>
               </div>
               <div className="py-4 space-y-2 px-4">
                 {navLinks.map((link, idx) => (
@@ -249,7 +249,7 @@ export default function Navbar() {
                 {isSignedIn ? (
                    <div className="space-y-3">
                     <div className="flex items-center gap-3 p-2 bg-white/5 rounded-lg text-white">
-                      <img src={user?.imageUrl} className="w-10 h-10 rounded-full border border-yellow-400 object-cover" alt="" />
+                      <img src={user?.imageUrl} className="w-10 h-10 rounded-full border border-yellow-400 object-cover" alt="صورة الملف الشخصي" />
                       <div className="truncate"><p className="font-bold">{user?.firstName}</p></div>
                     </div>
                     <Link to="/dashboard" onClick={closeSidebar}>
