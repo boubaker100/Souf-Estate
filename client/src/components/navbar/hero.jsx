@@ -22,19 +22,10 @@ import { useAuth } from "@clerk/clerk-react"
  */
 
 export default function HeroTemplate({
-    images=[
-          "/4.jpg",
-          "/3.png",
-          "/2.png",
-          "/10.png",
-          "/8.png",
-          "/6.png",
-          "/9.png",
-          "/5.png",
-          "/1.png",
-
-         
-  ],
+    images= [
+  "/4.webp", "/3.webp", "/2.webp", "/10.webp", "/8.webp",
+  "/6.webp", "/9.webp", "/5.webp", "/1.webp",
+],
   interval = 10000,
   title = "اعثر على منزل",
   titleHighlight = "أحلامك",
@@ -116,10 +107,12 @@ const elOuedCommunes = [
 <motion.img
                 fetchpriority="high"
                 loading="eager"
+                decoding="async"
+                alt={`صورة عقار ${currentImageIndex + 1}`}
                 className=" absolute inset-0 w-full h-screen object-cover kenburns-top"
                 key={images[currentImageIndex]}
                 src={images[currentImageIndex]}
-                onError={(e) => { e.currentTarget.src = "/souf.png"; }}
+                onError={(e) => { e.currentTarget.src = "/souf.webp"; }}
               />
  
       <div className=" absolute w-full h-50 top-0  bg-gradient-to-b from-black/100 " />
