@@ -80,7 +80,7 @@ export default function Navbar() {
         <div className="flex shrink-0">
           <Link to="/" className="flex items-center h-10">     
             {isFixed ?  <img src="/LOGO4.webp" className="w-auto h-full" alt="Logo" /> 
-            :            <img src="/LOGO3.webp" className="w-auto h-full" alt="Logo" /> }
+            :            <img src="/LOGO3.png" className="w-auto h-full" alt="Logo" /> }
           </Link>
         </div>
 
