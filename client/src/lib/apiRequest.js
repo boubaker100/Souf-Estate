@@ -8,6 +8,7 @@ const apiRequest = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: 60000, // 60s — يكفي للاستيقاظ Cold-start على Render مجاناً
 });
 
 // معالجة الاستجابات غير المتوقعة

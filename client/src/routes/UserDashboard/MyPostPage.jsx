@@ -18,6 +18,23 @@ export default function MyPostsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [loadingSince, setLoadingSince] = useState(null);
+  const [coldStartHint, setColdStartHint] = useState(false);
+
+  // عرض تلميح cold-start بعد 10 ثانية من التحميل
+  useEffect(() => {
+    if (!loading) {
+      setLoadingSince(null);
+      setColdStartHint(false);
+      return;
+    }
+    const now = Date.now();
+    setLoadingSince(now);
+    const timer = setTimeout(() => setColdStartHint(true), 10000);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [loading]);
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -108,11 +125,15 @@ export default function MyPostsPage() {
         </div>
       </div>
 
-      {/* حالة التحميل */}
+{/* حالة التحميل */}
       {loading && posts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-gray-500">
           <Loader2 className="w-8 h-8 animate-spin text-yellow-500 mb-2" />
-          <p className="font-medium text-sm">جاري تحميل إعلاناتك...</p>
+          <p className="font-medium text-sm">
+            {coldStartHint
+              ? "قد يستغرق الخادم 30-60 ثانية للاستيقاظ (cold start)..."
+              : "جاري تحميل إعلاناتك..."}
+          </p>
         </div>
       ) : error ? (
         <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-red-200 dark:border-red-800 space-y-4">
@@ -121,12 +142,20 @@ export default function MyPostsPage() {
             حدث خطأ أثناء التحميل
           </h3>
           <p className="text-sm text-gray-500">{error}</p>
-          <button
-            onClick={() => setRefreshKey((prev) => prev + 1)}
-            className="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-xl text-sm"
-          >
-            <RefreshCw size={16} /> إعادة المحاولة
-          </button>
+          <div className="flex items-center justify-center gap-3">
+            <button
+              onClick={() => setRefreshKey((prev) => prev + 1)}
+              className="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-xl text-sm"
+            >
+              <RefreshCw size={16} />عادة المحاولة
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-xl text-sm"
+            >
+              <RefreshCw size={16} />إعادة تحميل-page
+            </button>
+          </div>
         </div>
       ) : posts.length === 0 ? (
         <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 space-y-4">
