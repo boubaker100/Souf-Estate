@@ -57,12 +57,12 @@ export default function UsersTable() {
     setFilter,
   } = useDataTable({
     queryKey: "admin-users",
-    endpoint: "/admin/users",
+    endpoint: "/api/admin/users",
     initialLimit: LIMIT,
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => apiRequest.delete(`/admin/users/${id}`),
+    mutationFn: (id) => apiRequest.delete(`/api/admin/users/${id}`),
     onMutate: async (userId) => {
       await queryClient.cancelQueries({ queryKey: ["admin-users"] });
       const previousData = queryClient.getQueriesData({ queryKey: ["admin-users"] });

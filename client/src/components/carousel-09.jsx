@@ -340,7 +340,7 @@ export default function ImageCarousel({ images = [] }) {
                        src={failedImages.has(i) ? PLACEHOLDER : img}
                        alt={`Image ${i + 1}`}
                        loading={i === 0 ? "eager" : "lazy"}
-                       fetchPriority={i === 0 ? "high" : "auto"}
+                       fetchpriority={i === 0 ? "high" : "auto"}
                        decoding="async"
                        onError={() => handleImageError(i)}
                        onLoad={() =>
@@ -499,7 +499,7 @@ export default function ImageCarousel({ images = [] }) {
                             src={failedImages.has(i) ? PLACEHOLDER : img}
                             alt={`Fullscreen image ${i + 1}`}
                             loading={i === activeIndex ? "eager" : "lazy"}
-                            fetchPriority={i === activeIndex ? "high" : "auto"}
+                            fetchpriority={i === activeIndex ? "high" : "auto"}
                             decoding="async"
                             onError={() => handleImageError(i)}
                             onLoad={() =>

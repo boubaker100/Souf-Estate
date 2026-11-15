@@ -31,7 +31,20 @@ export default function MyPostsPage() {
       setPosts(res.data.data);
       setMeta(res.data.meta);
     } catch (err) {
-      setError("فشل تحميل الإعلانات");
+      console.error("My-posts error:", err);
+      const status = err?.response?.status;
+      const backendMsg = err?.response?.data?.message;
+      if (status === 401 || status === 403) {
+        setError("انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.");
+      } else if (status === 404) {
+        setError("الخادم غير متاح مؤقتاً. حاول بعد قليل.");
+      } else if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
+        setError("الخادم بطيء (cold start). حاول بعد 30 ثانية.");
+      } else if (backendMsg) {
+        setError(backendMsg);
+      } else {
+        setError("تعذر تحميل الإعلانات. حاول من جديد.");
+      }
       addToast("فشل تحميل الإعلانات", "error");
     } finally {
       setLoading(false);

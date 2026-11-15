@@ -370,7 +370,7 @@ sewage: showSewage ? formData.sewage : null,
         roof: showTerrace ? formData.roof : null,
       };
 
-      await apiRequest.put("/dashboard/" + id, {
+      await apiRequest.put("/api/dashboard/" + id, {
         post: postData,
       });
       toast.success("تم حفظ التعديلات بنجاح!");

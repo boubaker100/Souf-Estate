@@ -2,13 +2,14 @@ import { useNavigate, useLoaderData } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
-import { Maximize2, X } from "lucide-react";
+import { Maximize2, X, Bookmark, BookmarkCheck } from "lucide-react";
 import apiRequest from "../../lib/apiRequest";
 import { formatPrice } from "@/lib/formatPrice";
 import PostsMap from "@/components/map/PostsMap";
 import ImageCarousel from "@/components/carousel-09";
 import CommentSection from "@/components/comments/CommentSection";
 import Navbar from "@/components/navbar/Navbar";
+import { useToast } from "@/components/Userdashboard/toastProvider";
 
 // ===================== قواميس التسميات (مطابقة لـ PropertyCard.jsx و NewPostPage.jsx) =====================
 const PROPERTY_LABELS = {
@@ -74,11 +75,13 @@ const isYes = (v) => v === "yes" || v === true || v === "true";
 
 function SinglePage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const response = useLoaderData();
   const post = response?.data || response;
   const [saved, setSaved] = useState(post?.isSaved);
   const { isSignedIn } = useAuth();
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const [copied, setCopied] = useState(false);
   const [mapExpanded, setMapExpanded] = useState(false);
@@ -114,6 +117,27 @@ function SinglePage() {
     apiRequest.post(`/api/posts/${post.id}/view`).catch(() => {});
   }, [post?.id]);
 
+  // جلب حالة الحفظ الحالية للمستخدم (لعرض "تم الحفظ" عند التحميل)
+  useEffect(() => {
+    if (!isSignedIn || !post?.id) {
+      setSaved(false);
+      return;
+    }
+    let cancelled = false;
+    apiRequest
+      .get("/api/dashboard/saved")
+      .then((res) => {
+        const ids = (res.data?.data || []).map((p) => p.id);
+        if (!cancelled) setSaved(ids.includes(post.id));
+      })
+      .catch(() => {
+        if (!cancelled) setSaved(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isSignedIn, post?.id]);
+
   if (!post) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -124,15 +148,27 @@ function SinglePage() {
 
   const handleSave = async () => {
     if (!isSignedIn) return navigate("/sign-in");
-    setIsLoading(true); // تفعيل حالة التحميل
-    setSaved((prev) => !prev);
+    setIsSaving(true);
+    const previous = saved;
+    setSaved(!previous); // optimistic
     try {
-      await apiRequest.post("/users/save", { postId: post.id });
+      const res = await apiRequest.post(`/api/dashboard/saved/${post.id}`);
+      const nextSaved = res.data?.saved ?? !previous;
+      setSaved(nextSaved);
+      addToast(
+        nextSaved ? "تم حفظ الإعلان" : "تم إلغاء الحفظ",
+        nextSaved ? "success" : "info"
+      );
     } catch (err) {
-      setSaved((prev) => !prev);
-      console.log(err);
+      setSaved(previous); // revert
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "فشل حفظ الإعلان";
+      addToast(msg, "error");
+      console.error("Save error:", err);
     } finally {
-      setIsLoading(false); // إيقاف حالة التحميل
+      setIsSaving(false);
     }
   };
 
@@ -440,17 +476,19 @@ function SinglePage() {
                 اتصل الآن
               </a>
             )}
-            <button
-              disabled={isLoading}
-              onClick={handleSave}
-              className={`w-full font-bold py-4 rounded-xl border-2 transition ${
-                saved
-                  ? "bg-orange-100 border-orange-500 text-orange-700"
-                  : "bg-white border-gray-200 text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              {saved ? "تم الحفظ" : "حفظ الإعلان"}
-            </button>
+<button
+               disabled={isSaving}
+               onClick={handleSave}
+               aria-label={saved ? "remove from saved" : "save the listing"}
+               className={`w-full font-bold py-4 rounded-xl border-2 transition flex items-center justify-center gap-2 ${
+                 saved
+                   ? "bg-orange-100 border-orange-500 text-orange-700"
+                   : "bg-white border-gray-200 text-gray-700 hover:border-gray-300"
+               }`}
+             >
+               {saved ? <BookmarkCheck size={20} /> : <Bookmark size={20} />}
+               {saved ? "تم الحفظ" : "حفظ الإعلان"}
+             </button>
           </div>
 
           {/* التعليقات — نسخة الهاتف فقط، تظهر آخر شيء في الصفحة (بعد زر

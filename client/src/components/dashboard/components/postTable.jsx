@@ -248,7 +248,7 @@ export function PostsTable() {
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["admin-posts"] })
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => apiRequest.delete(`/admin/posts/${id}`),
+    mutationFn: (id) => apiRequest.delete(`/api/admin/posts/${id}`),
     onSuccess: () => {
       toast.success("تم حذف المنشور بنجاح", {
         description: "تم إزالة الإعلان من قاعدة البيانات.",
@@ -261,7 +261,7 @@ export function PostsTable() {
   })
 
   const bulkDeleteMutation = useMutation({
-    mutationFn: (ids) => apiRequest.post("/admin/posts/bulk-delete", { ids }),
+    mutationFn: (ids) => apiRequest.post("/api/admin/posts/bulk-delete", { ids }),
     onSuccess: (_, ids) => {
       toast.success(`تم حذف ${ids.length} منشور بنجاح`, {
         description: "تم إزالة المنشورات المحددة.",
