@@ -182,64 +182,64 @@ function SinglePage() {
   // وبنفس استثناءات الأراضي المطبّقة في PropertyCard.jsx (لا معنى لعرض
   // "عدد الغرف" أو "الطابق" على قطعة أرض فارغة).
   const quickSpecs = [
-    { icon: "/utility.webp", title: "نوع العقار", value: propertyLabel },
+    { icon: "/utility.png", title: "نوع العقار", value: propertyLabel },
     {
-      icon: "/bed.webp",
+      icon: "/bed.png",
       title: "التصميم الداخلي",
       value: !isBareLand && hasValue(post.rooms) ? post.rooms : null,
     },
     {
-      icon: "/pet.webp",
+      icon: "/pet.png",
       title: "عدد الحمامات",
       value: !isBareLand && hasValue(post.bathrooms) ? `${post.bathrooms}` : null,
     },
-    { icon: "/size.webp", title: "المساحة", value: getAreaValue() },
+    { icon: "/size.png", title: "المساحة", value: getAreaValue() },
     {
-      icon: "/size.webp",
+      icon: "/size.png",
       title: "رقم الطابق",
       value: !isBareLand && hasValue(post.floor) ? `${post.floor}` : null,
     },
     {
-      icon: "/utility.webp",
+      icon: "/utility.png",
       title: "عدد الطوابق",
       value: !isBareLand && hasValue(post.buildingFloors) ? `${post.buildingFloors}` : null,
     },
     {
-      icon: "/size.webp",
+      icon: "/size.png",
       title: "عدد الواجهات",
       value: !isBareLand && hasValue(post.facades) ? `${post.facades}` : null,
     },
     {
-      icon: "/utility.webp",
+      icon: "/utility.png",
       title: "سنة البناء",
       value: !isBareLand && hasValue(post.constructionYear) ? `${post.constructionYear}` : null,
     },
     {
-      icon: "/pet.webp",
+      icon: "/pet.png",
       title: "التأثيث",
       value: !isBareLand && isYes(post.furnished) ? "مؤثث" : null,
     },
     {
-      icon: "/fee.webp",
+      icon: "/fee.png",
       title: "مدة الكراء",
       value: isRent && hasValue(post.rentPeriod) ? RENT_PERIOD_LABELS[post.rentPeriod] || post.rentPeriod : null,
     },
     {
-      icon: "/utility.webp",
+      icon: "/utility.png",
       title: "حالة العقار",
       value: hasValue(post.propertyCondition)
         ? CONDITION_LABELS[post.propertyCondition] || post.propertyCondition
         : null,
     },
     {
-      icon: "/utility.webp",
+      icon: "/utility.png",
       title: "حالة البناء",
       value: !isBareLand && hasValue(post.constructionStatus)
         ? BUILD_CONDITION_LABELS[post.constructionStatus] || post.constructionStatus
         : null,
     },
     {
-      icon: "/utility.webp",
+      icon: "/utility.png",
       title: "بنية العقار",
       value: !isBareLand && hasValue(post.buildingMaterial)
         ? STRUCTURE_LABELS[post.buildingMaterial] || post.buildingMaterial
@@ -277,7 +277,7 @@ function SinglePage() {
             {/* بطاقة المعلن */}
             <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl mb-8 border border-gray-100">
               <img
-                src={post.user?.avatar || "/noavatar.webp"}
+                src={post.user?.avatar || "/noavatar.jpg"}
                 alt="user"
                 className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm"
               />
@@ -308,7 +308,7 @@ function SinglePage() {
                 {/* الموقع */}
                 <div className="flex items-center gap-2 text-gray-500 font-medium">
                   <img
-                    src="/pin.webp"
+                    src="/pin.png"
                     alt="location"
                     className="w-4 h-4 opacity-70"
                   />
@@ -328,7 +328,7 @@ function SinglePage() {
                           : " text-gray-600 bg-gray-50 border-gray-300 hover:bg-gray-200"
                       }`}
                     >
-                      <img src="/phone.webp" alt="phone" className="w-4 h-4 " />
+                      <img src="/phone.png" alt="phone" className="w-4 h-4 " />
                       {copied ? "تم النسخ ! " : primaryPhone}
                     </button>
                   </div>

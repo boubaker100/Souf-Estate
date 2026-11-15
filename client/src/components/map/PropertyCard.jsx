@@ -241,13 +241,13 @@ export default function PropertyCard({ post, isOwner = false, onDelete }) {
               type="button"
               aria-label="الصورة السابقة"
               onClick={prevImage}
-              className="absolute inset-y-0 right-0 w-1/3 z-[5]"
+              className="absolute inset-y-0  right-0 w-1/3 z-5"
             />
             <button
               type="button"
               aria-label="الصورة التالية"
               onClick={nextImage}
-              className="absolute inset-y-0 left-0 w-1/3 z-[5]"
+              className="absolute inset-y-0 left-0 w-1/3 z-5"
             />
 
             {/* أسهم مرئية واضحة فوق مناطق اللمس، تظهر دائماً على الهاتف وبتأثير hover على سطح المكتب */}
@@ -363,7 +363,7 @@ export default function PropertyCard({ post, isOwner = false, onDelete }) {
             </p>
             {postedLabel && (
               <div
-                className="flex items-center gap-1 text-gray-400 text-[11px] font-medium bg-gray-50 px-2.5 py-1 rounded-md shrink-0"
+                className=" flex items-center gap-1 text-gray-400 text-[11px] font-medium bg-gray-50 px-2.5 py-1 rounded-md shrink-0"
                 title={exactDateLabel}
               >
                 <Clock className="w-3.5 h-3.5 text-gray-400" />
@@ -373,7 +373,7 @@ export default function PropertyCard({ post, isOwner = false, onDelete }) {
           </div>
 
           <h3
-            className="text-lg font-bold text-gray-900 line-clamp-1"
+            className="mt-12 text-lg font-bold text-gray-900 line-clamp-1"
             title={hasValue(post.title) ? post.title : "عنوان غير محدد"}
           >
             {hasValue(post.title)
@@ -399,7 +399,7 @@ export default function PropertyCard({ post, isOwner = false, onDelete }) {
 
         {/* 3. شبكة المواصفات الأساسية — كل بطاقة تحمل عنوانها الخاص فوق القيمة */}
         {coreSpecs.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          <div className=" grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             {coreSpecs.map((spec, i) => {
               const Icon = spec.icon;
               return (
