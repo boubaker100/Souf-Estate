@@ -7,11 +7,10 @@ import apiRequest from "../../lib/apiRequest";
 import PropertyCard from "@/components/map/PropertyCard";
 import Pagination from "../../components/dashboard/components/Pagination";
 import { usePaginatedQuery } from "../../hooks/usePaginatedQuery";
-import { useToast } from "@/components/Userdashboard/toastProvider";
+import { toast } from "sonner";
 
 export default function MyPostsPage() {
   const { page, limit, search, sort, updateParams } = usePaginatedQuery();
-  const { addToast } = useToast();
   const location = useLocation();
 
   const [posts, setPosts] = useState([]);
@@ -30,7 +29,7 @@ export default function MyPostsPage() {
       });
       setPosts(res.data.data);
       setMeta(res.data.meta);
-    } catch (err) {
+} catch (err) {
       console.error("My-posts error:", err);
       const status = err?.response?.status;
       const backendMsg = err?.response?.data?.message;
@@ -45,30 +44,26 @@ export default function MyPostsPage() {
       } else {
         setError("تعذر تحميل الإعلانات. حاول من جديد.");
       }
-      addToast("فشل تحميل الإعلانات", "error");
+      toast.error("فشل تحميل الإعلانات");
     } finally {
       setLoading(false);
     }
-  }, [page, limit, search, sort, addToast]);
-
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts, refreshKey]);
+  }, [page, limit, search, sort]);
 
   useEffect(() => {
     if (location.state?.newPost) {
-      addToast("تم نشر إعلانك بنجاح!", "success");
+      toast.success("تم نشر إعلانك بنجاح!");
       setRefreshKey((prev) => prev + 1);
       window.history.replaceState({}, document.title);
     }
-  }, [location.state, addToast]);
+  }, [location.state]);
 
   const handleDelete = async (postId) => {
     if (!window.confirm("هل أنت متأكد من رغبتك في حذف هذا الإعلان نهائياً؟")) return;
     try {
       const res = await apiRequest.delete(`/api/dashboard/${postId}`);
       if (res.data.success) {
-        addToast("تم حذف الإعلان بنجاح", "success");
+        toast.success("تم حذف الإعلان بنجاح");
         if (posts.length === 1 && page > 1) {
           updateParams({ page: page - 1 });
         } else {
@@ -76,7 +71,7 @@ export default function MyPostsPage() {
         }
       }
     } catch (err) {
-      addToast(err.response?.data?.message || "حدث خطأ أثناء الحذف", "error");
+      toast.error(err.response?.data?.message || "حدث خطأ أثناء الحذف");
     }
   };
 

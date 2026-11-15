@@ -9,7 +9,7 @@ import PostsMap from "@/components/map/PostsMap";
 import ImageCarousel from "@/components/carousel-09";
 import CommentSection from "@/components/comments/CommentSection";
 import Navbar from "@/components/navbar/Navbar";
-import { useToast } from "@/components/Userdashboard/toastProvider";
+import { toast } from "sonner";
 
 // ===================== قواميس التسميات (مطابقة لـ PropertyCard.jsx و NewPostPage.jsx) =====================
 const PROPERTY_LABELS = {
@@ -81,7 +81,6 @@ function SinglePage() {
   const [saved, setSaved] = useState(post?.isSaved);
   const { isSignedIn } = useAuth();
   const navigate = useNavigate();
-  const { addToast } = useToast();
 
   const [copied, setCopied] = useState(false);
   const [mapExpanded, setMapExpanded] = useState(false);
@@ -155,17 +154,14 @@ function SinglePage() {
       const res = await apiRequest.post(`/api/dashboard/saved/${post.id}`);
       const nextSaved = res.data?.saved ?? !previous;
       setSaved(nextSaved);
-      addToast(
-        nextSaved ? "تم حفظ الإعلان" : "تم إلغاء الحفظ",
-        nextSaved ? "success" : "info"
-      );
+      toast.success(nextSaved ? "تم حفظ الإعلان" : "تم إلغاء الحفظ");
     } catch (err) {
       setSaved(previous); // revert
       const msg =
         err?.response?.data?.message ||
         err?.message ||
         "فشل حفظ الإعلان";
-      addToast(msg, "error");
+      toast.error(msg);
       console.error("Save error:", err);
     } finally {
       setIsSaving(false);
