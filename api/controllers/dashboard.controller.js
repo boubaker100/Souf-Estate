@@ -105,6 +105,15 @@ export const toggleSavePost = async (req, res, next) => {
   try {
     const { postId } = req.params;
 
+    const post = await prisma.post.findUnique({ where: { id: postId } });
+    if (!post) {
+      return res.status(404).json({ success: false, message: "الإعلان غير موجود" });
+    }
+
+    if (post.userId === req.user.id) {
+      return res.status(403).json({ success: false, message: "لا يمكنك حفظ إعلانك الخاص" });
+    }
+
     const existing = await prisma.savedPost.findFirst({
       where: { userId: req.user.id, postId },
     });

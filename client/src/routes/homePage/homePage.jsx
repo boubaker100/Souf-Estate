@@ -3,7 +3,7 @@ import FilterBar from "../../components/filterBar/FilterBar";
 import HeroTemplate from "../../components/navbar/hero";
 import PostsListWithMap from "@/components/map/PostsListWithMapLayout";
 import apiRequest from "../../lib/apiRequest";
-import Footer from "@/components/map/Footer";
+import Footer from "@/routes/homePage/Footer";
 
 const LIMIT = 12; // يقبل القسمة على 2 و3 فلا تظهر فراغات في الشبكة
 

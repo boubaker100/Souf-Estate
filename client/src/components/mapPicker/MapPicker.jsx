@@ -2,14 +2,33 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { useState, useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 
+const isValidLatLng = (lat, lng) => {
+  const nLat = Number(lat);
+  const nLng = Number(lng);
+  return (
+    Number.isFinite(nLat) &&
+    Number.isFinite(nLng) &&
+    nLat >= -90 &&
+    nLat <= 90 &&
+    nLng >= -180 &&
+    nLng <= 180
+  );
+};
+
+const DEFAULT_CENTER = [33.3683, 6.8674]; // El Oued
+
 function LocationMarker({ onSelect, initialPosition }) {
   const [position, setPosition] = useState(
-    initialPosition ? { lat: Number(initialPosition.lat), lng: Number(initialPosition.lng) } : null
+    initialPosition && isValidLatLng(initialPosition.lat, initialPosition.lng)
+      ? { lat: Number(initialPosition.lat), lng: Number(initialPosition.lng) }
+      : null
   );
 
   useEffect(() => {
-    if (initialPosition) {
+    if (initialPosition && isValidLatLng(initialPosition.lat, initialPosition.lng)) {
       setPosition({ lat: Number(initialPosition.lat), lng: Number(initialPosition.lng) });
+    } else {
+      setPosition(null);
     }
   }, [initialPosition]);
 
@@ -25,12 +44,16 @@ function LocationMarker({ onSelect, initialPosition }) {
 
 export default function MapPicker({ onSelect, initialPosition }) {
   const [center, setCenter] = useState(
-    initialPosition ? [Number(initialPosition.lat), Number(initialPosition.lng)] : [33.367, 6.851]
+    initialPosition && isValidLatLng(initialPosition.lat, initialPosition.lng)
+      ? [Number(initialPosition.lat), Number(initialPosition.lng)]
+      : DEFAULT_CENTER
   );
 
   useEffect(() => {
-    if (initialPosition) {
+    if (initialPosition && isValidLatLng(initialPosition.lat, initialPosition.lng)) {
       setCenter([Number(initialPosition.lat), Number(initialPosition.lng)]);
+    } else {
+      setCenter(DEFAULT_CENTER);
     }
   }, [initialPosition]);
 

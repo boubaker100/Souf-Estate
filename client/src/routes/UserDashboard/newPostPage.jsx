@@ -391,7 +391,7 @@ export default function NewPostPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">إضافة إعلان عقاري جديد</h1>
           <p className="text-gray-600">
-            أدخل تفاصيل عقارك بدقة لعرضه أمام المشترين والمستأجرين
+            أدخل تفاصيل عقارك بدقة لعرضه أمام المشترين والمستأجرين تفاصيل الاعلان تساعد عملية الفلترة للوصول الى إعلانك بشكل ادق واسرع 
           </p>
         </div>
 
@@ -482,7 +482,7 @@ export default function NewPostPage() {
                       value={formData.district}
                       onChange={handleInputChange}
                       placeholder="مثال: حي الصحن الثاني .. حي القواطين .."
-                      required
+                      
                       style={{ lineHeight: "1.7" }}
                       className="w-full text-sm border-gray-300"
                     />

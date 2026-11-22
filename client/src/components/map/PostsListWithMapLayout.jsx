@@ -157,7 +157,7 @@ export default function PostsListWithMap({
 
       <motion.div variants={itemVariants} className="space-y-6 px-2 sm:px-6">
         {/* الخريطة: عرض كامل (كل العقارات المفلترة) */}
-        <div className="w-full h-[350px] sm:h-[450px] lg:h-[500px]">
+        <div className="w-full h-[550px] sm:h-[450px] lg:h-[500px]">
           <div className="rounded-2xl w-full h-full overflow-hidden shadow-lg border border-gray-100">
             <PostsMap posts={markers} className="h-full" onMarkerClick={handleMarkerClick} />
           </div>
@@ -197,57 +197,13 @@ export default function PostsListWithMap({
             !loading && <EmptyState />
           ) : (
             <div className={loading ? "opacity-60 pointer-events-none transition-opacity" : "transition-opacity"}>
-              {isDesktop ? (
-                <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
-                  {pagePosts.map((post) => (
-                    <motion.div key={post.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                      <PropertyCard post={post} />
-                    </motion.div>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {total > 1 && (
-                    <div className="text-center text-xs text-gray-500 font-bold tracking-wider">
-                      عقار {safeIndex + 1} من {total} في هذه الصفحة
-                    </div>
-                  )}
-                  <div className="relative px-1">
-                    <div className="overflow-hidden pt-1">
-                      <AnimatePresence mode="wait">
-                        <motion.div
-                          key={pagePosts[safeIndex].id}
-                          initial={{ opacity: 0, x: 40 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -40 }}
-                          transition={{ duration: 0.25, ease: "easeInOut" }}
-                        >
-                          <PropertyCard post={pagePosts[safeIndex]} />
-                        </motion.div>
-                      </AnimatePresence>
-                    </div>
-
-                    {total > 1 && (
-                      <>
-                        <button
-                          onClick={prevCard}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2.5 bg-white/95 border border-gray-200 text-gray-800 rounded-full shadow-lg active:scale-90 hover:bg-gray-50 transition-all duration-200"
-                          aria-label="العقار السابق"
-                        >
-                          <ChevronRight className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={nextCard}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2.5 bg-white/95 border border-gray-200 text-gray-800 rounded-full shadow-lg active:scale-90 hover:bg-gray-50 transition-all duration-200"
-                          aria-label="العقار التالي"
-                        >
-                          <ChevronLeft className="w-5 h-5" />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
+                {pagePosts.map((post) => (
+                  <motion.div key={post.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <PropertyCard post={post} />
+                  </motion.div>
+                ))}
+              </div>
             </div>
           )}
 

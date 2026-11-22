@@ -3,9 +3,9 @@ import { Mail, Phone, MessageCircle, Facebook, Clock, MapPin } from "lucide-reac
 
 // ===================== معلومات التواصل =====================
 // ⚠️ عدّل القيم التالية ببياناتك الحقيقية قبل النشر:
-const CONTACT_EMAIL = "contact@example.com" // عدّل هذا بإيميلك الحقيقي
-const WHATSAPP_NUMBER = "213500000000" // بصيغة دولية بدون + أو 0 في البداية (مثال جزائري: 2136XXXXXXXX)
-const WHATSAPP_DISPLAY = "+213 500 00 00 00" // نفس الرقم لكن بصيغة معروضة للقراءة
+const CONTACT_EMAIL = "boubakerboudinadev@gmail.com" // عدّل هذا بإيميلك الحقيقي
+const WHATSAPP_NUMBER = "213669883179" // بصيغة دولية بدون + أو 0 في البداية (مثال جزائري: 2136XXXXXXXX)
+const WHATSAPP_DISPLAY = "06 69 88 31 79" // نفس الرقم لكن بصيغة معروضة للقراءة
 const FACEBOOK_URL = "https://facebook.com/yourpage" // عدّل برابط صفحتك الحقيقي
 
 const contactMethods = [

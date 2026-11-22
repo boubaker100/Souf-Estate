@@ -28,12 +28,10 @@ function usePreloadImages(images, currentIndex, isFullscreen) {
       }
     };
 
-    // Always preload the current image and its neighbors.
     add(currentIndex);
     add(currentIndex - 1);
     add(currentIndex + 1);
 
-    // When fullscreen opens, preload all images for smoother navigation.
     if (isFullscreen) {
       images.forEach((img) => {
         if (img) urls.add(img);
@@ -128,10 +126,8 @@ export default function ImageCarousel({ images = [] }) {
   // Lock body scroll while fullscreen is open.
   React.useEffect(() => {
     if (typeof document === "undefined") return;
-
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = isFullscreen ? "hidden" : previousOverflow || "auto";
-
     return () => {
       document.body.style.overflow = previousOverflow;
     };
@@ -146,14 +142,8 @@ export default function ImageCarousel({ images = [] }) {
         setIsFullscreen(false);
         return;
       }
-
-      if (e.key === "ArrowRight") {
-        fullscreenApi?.scrollNext();
-      }
-
-      if (e.key === "ArrowLeft") {
-        fullscreenApi?.scrollPrev();
-      }
+      if (e.key === "ArrowRight") fullscreenApi?.scrollNext();
+      if (e.key === "ArrowLeft") fullscreenApi?.scrollPrev();
     };
 
     window.addEventListener("keydown", onKeyDown);
@@ -183,21 +173,16 @@ export default function ImageCarousel({ images = [] }) {
     (e) => {
       if (!isFullscreen) return;
       e.preventDefault();
-
       const direction = e.deltaY > 0 ? -0.08 : 0.08;
       const nextZoom = clamp(zoom + direction, 1, 3);
       setZoom(nextZoom);
-
-      if (nextZoom === 1) {
-        setPosition({ x: 0, y: 0 });
-      }
+      if (nextZoom === 1) setPosition({ x: 0, y: 0 });
     },
     [isFullscreen, zoom]
   );
 
   const handleDoubleClick = React.useCallback(() => {
     if (!isFullscreen) return;
-
     if (zoom === 1) {
       setZoom(2);
     } else {
@@ -220,7 +205,6 @@ export default function ImageCarousel({ images = [] }) {
   const handleMouseMove = React.useCallback(
     (e) => {
       if (!isFullscreen || !isDragging || zoom === 1) return;
-
       const nextX = e.clientX - dragStartRef.current.x;
       const nextY = e.clientY - dragStartRef.current.y;
       setPosition({ x: nextX, y: nextY });
@@ -241,7 +225,6 @@ export default function ImageCarousel({ images = [] }) {
   const handleTouchStart = React.useCallback(
     (e) => {
       if (!isFullscreen) return;
-
       if (e.touches.length === 2) {
         setTouchStartDist(getTouchDistance(e.touches));
       }
@@ -252,7 +235,6 @@ export default function ImageCarousel({ images = [] }) {
   const handleTouchMove = React.useCallback(
     (e) => {
       if (!isFullscreen) return;
-
       if (e.touches.length === 2 && touchStartDist) {
         e.preventDefault();
         const newDist = getTouchDistance(e.touches);
@@ -267,35 +249,12 @@ export default function ImageCarousel({ images = [] }) {
 
   const toggleZoom = React.useCallback(() => {
     if (!isFullscreen) return;
-
     if (zoom === 1) {
       setZoom(2);
       return;
     }
-
     resetZoom();
   }, [isFullscreen, zoom, resetZoom]);
-
-  React.useEffect(() => {
-  if (!mainApi || !thumbApi) return;
-
-  const onSelect = () => {
-    const index = mainApi.selectedScrollSnap();
-
-    setCurrent(index);
-
-    // 👇 هذا هو السحر (auto center)
-    thumbApi.scrollTo(index);
-  };
-
-  mainApi.on("select", onSelect);
-
-  return () => {
-    mainApi.off("select", onSelect);
-  };
-}, [mainApi, thumbApi]);
-
-  const currentSrc = images[activeIndex] || "";
 
   const handleImageError = React.useCallback((index) => {
     setFailedImages((prev) => {
@@ -318,15 +277,13 @@ export default function ImageCarousel({ images = [] }) {
   return (
     <>
       {/* ================= MAIN IMAGE ================= */}
-      <div className="h-[50vh] md:h-[75vh] w-full flex flex-col shadow-2xl mb-8">
+      {/* التعديل هنا: زيادة الهامش السفلي mb-16 لإفراغ مساحة للصور المصغرة */}
+      <div className="h-[50vh] md:h-[75vh] w-full flex flex-col shadow-2xl mb-16 relative">
         <div className="relative overflow-hidden flex-1">
           <Carousel
             setApi={setMainApi}
-            opts={{
-              align: "start",
-              loop: images.length > 1,
-            }}
-            className="w-full" 
+            opts={{ align: "start", loop: images.length > 1 }}
+            className="w-full"
           >
             <CarouselContent>
               {images.map((img, i) => (
@@ -336,16 +293,14 @@ export default function ImageCarousel({ images = [] }) {
                       <div className="absolute inset-0 animate-pulse bg-muted" />
                     )}
 
-<img
-                       src={failedImages.has(i) ? PLACEHOLDER : img}
-                       alt={`Image ${i + 1}`}
-                       loading={i === 0 ? "eager" : "lazy"}
-                       fetchpriority={i === 0 ? "high" : "auto"}
-                       decoding="async"
-                       onError={() => handleImageError(i)}
-                       onLoad={() =>
-                        setMainLoaded((prev) => ({ ...prev, [i]: true }))
-                      }
+                    <img
+                      src={failedImages.has(i) ? PLACEHOLDER : img}
+                      alt={`Image ${i + 1}`}
+                      loading={i === 0 ? "eager" : "lazy"}
+                      fetchpriority={i === 0 ? "high" : "auto"}
+                      decoding="async"
+                      onError={() => handleImageError(i)}
+                      onLoad={() => setMainLoaded((prev) => ({ ...prev, [i]: true }))}
                       className={cn(
                         "h-full w-full object-cover transition-opacity duration-300",
                         mainLoaded[i] ? "opacity-100" : "opacity-0"
@@ -355,7 +310,7 @@ export default function ImageCarousel({ images = [] }) {
                     <button
                       type="button"
                       onClick={() => openFullscreen(i)}
-                      className="absolute  bottom-3 right-3 z-10 inline-flex items-center gap-2 rounded-full bg-black/60 px-3 py-2 text-sm  text-white backdrop-blur-md transition hover:bg-black/80"
+                      className="absolute bottom-3 right-3 z-30 inline-flex items-center gap-2 rounded-full bg-black/60 px-3 py-2 text-sm text-white backdrop-blur-md transition hover:bg-black/80"
                       aria-label="Open fullscreen"
                     >
                       <Maximize2 size={16} />
@@ -369,84 +324,78 @@ export default function ImageCarousel({ images = [] }) {
             <CarouselPrevious className="left-3 border-white/20 bg-black/35 text-white backdrop-blur-md hover:bg-black/55" />
             <CarouselNext className="right-3 border-white/20 bg-black/35 text-white backdrop-blur-md hover:bg-black/55" />
           </Carousel>
-        </div>  
-         {/* ================= THUMBNAILS ================= */}
-      <div className="absolute bottom-3 left-1/4 md:left-1/3 -translate-x-1/4 max-w-3xl w-[95%] z-20">
+        </div>
 
-  {/* ================= DESKTOP (thumbnails) ================= */}
-  <div className="hidden md:block">
-    <Carousel
-      setApi={setThumbApi}
-      opts={{
-        align: "center",
-        dragFree: true,
-        containScroll: "keepSnaps",
-      }}
-      className="w-full"
-    >
-      <CarouselContent>
-        {images.map((img, index) => (
-          <CarouselItem
-            key={`thumb-${img}-${index}`}
-          
-            className={cn("basis-1/5 lg:basis-1/7 px-0.5",
-            current === index
-            ?"mx-3 mt-2 p-1":"my-2.5 mx-1"
-          )}
-          >
-            <button
-              onClick={() => mainApi?.scrollTo(index)}
-              className={cn(
-                "group relative overflow-hidden rounded-xl border transition-all duration-300",
+        {/* ================= THUMBNAILS ================= */}
+        {/* التعديل هنا: تغيير bottom-0 إلى -bottom-10 لتنزل الصور المصغرة للخارج */}
+        {images.length > 1 && (
+          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 max-w-3xl w-[60%] md:w-[40%] z-20 pointer-events-none">
+            <div className="hidden md:block pointer-events-auto">
+              <Carousel
+                setApi={setThumbApi}
+                opts={{
+                  align: "center",
+                  containScroll: false,
+                  loop: true,
+                  dragFree: false,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-1">
+                  {images.map((img, index) => (
+                    <CarouselItem
+                      key={`thumb-${img}-${index}`}
+                      className={cn(
+                        "basis-1/6 lg:basis-1/4 pl-1",
+                        current === index ? "py-1" : "py-2"
+                      )}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          mainApi?.scrollTo(index);
+                          thumbApi?.scrollTo(index);
+                        }}
+                        className={cn(
+                          "group relative w-full overflow-hidden rounded-xl border-2 transition-all duration-300 bg-white shadow-lg",
+                          current === index
+                            ? "border-yellow-400 ring-1 ring-yellow-400/30 shadow-md shadow-yellow-400/10 scale-105"
+                            : "border-white/80 opacity-80 hover:opacity-100 hover:scale-105"
+                        )}
+                      >
+                        <img
+                          src={img}
+                          alt={`thumbnail ${index + 1}`}
+                          className="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-110"
+                        />
+                      </button>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
+            </div>
 
-                current === index
-                  ? "scale-120 border-white ring-2 ring-white/40 shadow-lg"
-                  : "opacity-70 hover:opacity-100 hover:scale-105"
-              )}
-            >
-              <img
-                src={img}
-                className="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-110"
-              />
-            </button>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-    </Carousel>
-  </div>
-
-  {/* ================= MOBILE (dots) ================= */}
-  <div className="flex justify-center gap-2 md:hidden">
-    {images.map((_, index) => (
-      <button
-        key={index}
-        onClick={() => mainApi?.scrollTo(index)}
-        className={cn(
-          "h-2 rounded-full transition-all duration-300",
-          current === index
-            ? "w-6 bg-white"
-            : "w-2 bg-white/50"
+            {/* ================= MOBILE (dots) ================= */}
+            <div className="flex justify-center gap-2 md:hidden pointer-events-auto pb-4">
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => mainApi?.scrollTo(index)}
+                  className={cn(
+                    "h-2 rounded-full transition-all duration-300",
+                    current === index ? "w-6 bg-white" : "w-2 bg-white/50"
+                  )}
+                />
+              ))}
+            </div>
+          </div>
         )}
-      />
-    ))}
-  </div>
-</div>
-    
-    
-    
       </div>
-
-   
 
       {/* ================= FULLSCREEN ================= */}
       {isFullscreen && (
-        <div className="fixed inset-0 z-1000 animate-[fadeIn_180ms_ease-out] bg-black">
-          <style>{`
-            @keyframes fadeIn {
-              from { opacity: 0; }
-              to { opacity: 1; }
-            }
-          `}</style>
+        <div className="fixed inset-0 z-[9999] animate-[fadeIn_180ms_ease-out] bg-black">
+          <style>{`@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`}</style>
 
           <button
             type="button"
@@ -454,17 +403,13 @@ export default function ImageCarousel({ images = [] }) {
               setIsFullscreen(false);
               resetZoom();
             }}
-            className="absolute right-4 top-4 z-50 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20"
+            className="absolute right-4 top-4 z-[10000] inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20"
             aria-label="Close fullscreen"
           >
             <X size={20} />
           </button>
 
           <div className="flex h-full w-full flex-col items-center justify-center px-3 pb-3 pt-2 sm:px-6">
-            {/* Thumbnails above the fullscreen image */}
-       
-
-            {/* Fullscreen image */}
             <div className="relative flex h-full w-full max-w-6xl items-center justify-center overflow-hidden rounded-2xl bg-black/20">
               <Carousel
                 setApi={setFullscreenApi}
@@ -479,7 +424,7 @@ export default function ImageCarousel({ images = [] }) {
                   {images.map((img, i) => (
                     <CarouselItem key={`fs-img-${img}-${i}`}>
                       <div
-                        className="relative flex h-screen bg-black/20 items-center justify-center overflow-hidden "
+                        className="relative flex h-screen bg-black/20 items-center justify-center overflow-hidden"
                         onWheel={handleWheel}
                         onDoubleClick={handleDoubleClick}
                         onMouseDown={handleMouseDown}
@@ -495,16 +440,14 @@ export default function ImageCarousel({ images = [] }) {
                           <div className="absolute inset-0 animate-pulse bg-white/5" />
                         )}
 
-<img
-                            src={failedImages.has(i) ? PLACEHOLDER : img}
-                            alt={`Fullscreen image ${i + 1}`}
-                            loading={i === activeIndex ? "eager" : "lazy"}
-                            fetchpriority={i === activeIndex ? "high" : "auto"}
-                            decoding="async"
-                            onError={() => handleImageError(i)}
-                            onLoad={() =>
-                            setFullscreenLoaded((prev) => ({ ...prev, [i]: true }))
-                          }
+                        <img
+                          src={failedImages.has(i) ? PLACEHOLDER : img}
+                          alt={`Fullscreen image ${i + 1}`}
+                          loading={i === activeIndex ? "eager" : "lazy"}
+                          fetchpriority={i === activeIndex ? "high" : "auto"}
+                          decoding="async"
+                          onError={() => handleImageError(i)}
+                          onLoad={() => setFullscreenLoaded((prev) => ({ ...prev, [i]: true }))}
                           className={cn(
                             "max-h-full max-w-full select-none object-contain transition-[transform,opacity] duration-200",
                             fullscreenLoaded[i] ? "opacity-100" : "opacity-0"
@@ -516,7 +459,6 @@ export default function ImageCarousel({ images = [] }) {
                           }}
                         />
 
-                        {/* Zoom controls */}
                         <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/10 px-2 py-2 backdrop-blur-md">
                           <button
                             type="button"
@@ -526,7 +468,6 @@ export default function ImageCarousel({ images = [] }) {
                           >
                             <ZoomOut size={16} />
                           </button>
-
                           <button
                             type="button"
                             onClick={toggleZoom}
@@ -535,7 +476,6 @@ export default function ImageCarousel({ images = [] }) {
                           >
                             {zoom === 1 ? "Zoom 2x" : "Reset"}
                           </button>
-
                           <button
                             type="button"
                             onClick={() => setZoom((z) => clamp(Number((z + 0.25).toFixed(2)), 1, 3))}

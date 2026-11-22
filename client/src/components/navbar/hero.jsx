@@ -1,15 +1,18 @@
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { LayoutTextFlip } from "../ui/layout-text-flip"
-import { Highlight } from "../ui/hero-highlight"
-import { HoverBorderGradient } from "../ui/hover-border-gradient"
-import { InteractiveHoverButton } from "../ui/interactive-hover-button"
-import { Link, useNavigate } from "react-router-dom"
-import { useAuth } from "@clerk/clerk-react"
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { motion } from "framer-motion";
+import { LayoutTextFlip } from "../ui/layout-text-flip";
+import { Highlight } from "../ui/hero-highlight";
+import { HoverBorderGradient } from "../ui/hover-border-gradient";
+import { LiquidButton } from "@/components/ui/liquid";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
+import { Download, Smartphone } from "lucide-react";
+import { toast } from "sonner";
+import { usePWAInstall } from "../../hooks/usePWAInstall";
 
- /**
+/**
  * HeroTemplate - مكون Hero احترافي قابل لإعادة الاستخدام
- * 
+ *
  * @param {Array<string>} images - مصفوفة عناوين URL للصور
  * @param {number} interval - الفترة الزمنية بين تغيير الصور (ms) - default: 5000
  * @param {string} title - العنوان الرئيسي
@@ -22,10 +25,17 @@ import { useAuth } from "@clerk/clerk-react"
  */
 
 export default function HeroTemplate({
-    images= [
-  "/4.webp", "/3.webp", "/2.webp", "/10.webp", "/8.webp",
-  "/6.webp", "/9.webp", "/5.webp", "/1.webp",
-],
+  images = [
+    "/4.webp",
+    "/3.webp",
+    "/2.webp",
+    "/10.webp",
+    "/8.webp",
+    "/6.webp",
+    "/9.webp",
+    "/5.webp",
+    "/1.webp",
+  ],
   interval = 10000,
   title = "اعثر على منزل",
   titleHighlight = "أحلامك",
@@ -35,88 +45,134 @@ export default function HeroTemplate({
 
   className = "",
 }) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const imgRef = useRef(null);
+  const currentIndexRef = useRef(0);
   const navigate = useNavigate();
-  const [scrollY, setScrollY] = useState(0)
-  const isLoggedIn = false; 
+  const [scrollY, setScrollY] = useState(0);
+  const isLoggedIn = false;
   const { isSignedIn, isLoaded } = useAuth();
+  const { promptInstall, isStandalone } = usePWAInstall();
+
+  const handleInstallClick = async () => {
+    const result = await promptInstall();
+    switch (result.status) {
+      case "already-installed":
+        toast.success("التطبيقات مثبت بالفعل على جهازك");
+        break;
+      case "ios-instructions":
+        toast.info(result.message, { duration: 8000 });
+        break;
+      case "not-available":
+        toast.info(result.message, { duration: 6000 });
+        break;
+      case "accepted":
+        toast.success("تم تثبيت التطبيقات بنجاح");
+        break;
+      case "dismissed":
+        toast.info("يمكنك تثبيت التطبيقات لاحقاً من قائمة المتصفح");
+        break;
+    }
+  };
   const handlePublishClick = (e) => {
-   if (!isLoaded) {
+    if (!isLoaded) {
       e.preventDefault();
       return;
     }
-    
+
     if (!isSignedIn) {
       e.preventDefault();
       navigate("/sign-in", { state: { from: "/dashboard/add" } });
-    }else {
-    navigate("/sign-in");          // اذهب إلى صفحة تسجيل الدخول
-  }
+    } else {
+      navigate("/sign-in"); // اذهب إلى صفحة تسجيل الدخول
+    }
   };
 
-useEffect(() => {
-  const handleScroll = () => setScrollY(window.scrollY)
-  window.addEventListener("scroll", handleScroll)
-  return () => window.removeEventListener("scroll", handleScroll)
-}, [])
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // تبديل الصور تلقائياً
   useEffect(() => {
-    if ( images.length <= 1) return
+    if (images.length <= 1) return;
 
-    const timer = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length)
-    }, interval)
+    let cancelled = false;
+    const timer = setInterval(async () => {
+      const next = (currentIndexRef.current + 1) % images.length;
+      const img = new Image();
+      img.src = images[next];
+      try {
+        await img.decode();
+      } catch (e) {
+        // broken image — advance anyway, onError will fall back to /souf.webp
+      }
+      if (cancelled) return;
+      currentIndexRef.current = next;
+      setCurrentImageIndex(next);
+    }, interval);
 
-    return () => clearInterval(timer)
-  }, [images.length, interval])
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [images.length, interval]);
 
+  // إعادة تشغيل أنيميشن kenburns при تغيير الصورة (بدون remount)
+  useLayoutEffect(() => {
+    const el = imgRef.current;
+    if (!el) return;
+    el.style.animation = "none";
+    void el.offsetHeight; // force reflow
+    el.style.animation = "";
+  }, [currentImageIndex]);
 
-
-const elOuedCommunes = [
-  "الوادي",
-  "الرباح",
-  "وادي العلندة",
-  "البياضة",
-  "النخلة",
-  "قمار",
-  "كوينين",
-  "الرقيبة",
-  "الحمراية",
-  "تغزوت",
-  "الدبيلة",
-  "حساني عبد الكريم",
-  "حاسي خليفة",
-  "طالب العربي",
-  "دوار الماء",
-  "سيدي عون",
-  "الطريفاوي",
-  "المقرن",
-  "بن قشة",
-  "ورماس",
-  "العقلة",
-  "ميه ونسة"
-];
-  
-
+  const elOuedCommunes = [
+    "الوادي",
+    "الرباح",
+    "وادي العلندة",
+    "البياضة",
+    "النخلة",
+    "قمار",
+    "كوينين",
+    "الرقيبة",
+    "الحمراية",
+    "تغزوت",
+    "الدبيلة",
+    "حساني عبد الكريم",
+    "حاسي خليفة",
+    "طالب العربي",
+    "دوار الماء",
+    "سيدي عون",
+    "الطريفاوي",
+    "المقرن",
+    "بن قشة",
+    "ورماس",
+    "العقلة",
+    "ميه ونسة",
+  ];
 
   return (
-    <div className={`shadow-2xl relative w-full h-screen overflow-hidden  ${className}`}>
+    <div
+      className={`shadow-2xl relative w-full h-screen overflow-hidden  ${className}`}
+    >
       {/* Slides Container */}
-      
-<motion.img
-                fetchpriority="high"
-                loading="eager"
-                decoding="async"
-                alt={`صورة عقار ${currentImageIndex + 1}`}
-                className=" absolute inset-0 w-full h-screen object-cover kenburns-top"
-                key={images[currentImageIndex]}
-                src={images[currentImageIndex]}
-                onError={(e) => { e.currentTarget.src = "/souf.webp"; }}
-              />
- 
+
+      <motion.img
+        ref={imgRef}
+        fetchpriority="high"
+        loading="eager"
+        decoding="async"
+        alt={`صورة عقار ${currentImageIndex + 1}`}
+        className="absolute inset-0 w-full h-screen object-cover kenburns-down"
+        src={images[currentImageIndex]}
+        onError={(e) => {
+          e.currentTarget.src = "/souf.webp";
+        }}
+      />
+
       <div className=" absolute w-full h-50 top-0  bg-gradient-to-b from-black/100 " />
-    
 
       {/* Content */}
       <motion.div
@@ -125,85 +181,62 @@ const elOuedCommunes = [
         transition={{ duration: 0.8, delay: 0.2 }}
         className="relative sm:h-180 h-160 flex flex-col justify-center items-center text-center text-white px-4 sm:px-6 lg:px-8 py-2"
       >
-     
         {/* Title */}
-  
-  
 
+        <div className="">
+<h1
+            style={{
+              textShadow:
+                "-1px -1px 2px black, 1px -1px 3px black, -1px 1px 6px black, 1px 1px 5px black",
+            }}
+            className=" text-4xl md:text-5xl font-extrabold flex-col text-white drop-shadow-[7px_10px_5px_rgba(0,0,0,0.6)]  leading-relaxed "
+          >
+            إبدأ رحلة البحث عن <span className="text-yellow-400">عقارك </span>{" "}
+            من <span className="text-yellow-400">هنا</span>
+          </h1>
 
-<div className="" >
+          <motion.div dir="rtl" className="relative font-extrabold mt-5 ">
+            <div className="flex flex-col md:flex-row justify-center items-center text-md shadow-2xs leading-relaxed">
+              <Highlight>
+                ابحث عن عقارات للبيع والكراء بسهولة، مع خريطة تفاعلية. في
+                بلديات{" "}
+              </Highlight>
 
-
-  <h1
-    style={{
-      textShadow: `
-      -1px -1px 2 black,
-       1px -1px 3 black,
-      -1px  1px 6 black,
-       1px  1px 5 black
-      `
-    }}
-    className=" text-4xl md:text-5xl font-extrabold flex-col text-white drop-shadow-[7px_10px_5px_rgba(0,0,0,0.6)]  leading-relaxed "
-  >   
-      إبدأ رحلة البحث عن <span className="text-yellow-400">عقارك </span>  من <span className="text-yellow-400">هنا</span>
-  </h1>
- 
-  
-
-<motion.div
-  dir="rtl"
-  className="relative font-extrabold mt-5 "
->
-  
-<div className="flex flex-col md:flex-row justify-center items-center text-md shadow-2xs leading-relaxed">
-  
-  <Highlight>
-    ابحث عن عقارات للبيع والكراء بسهولة، مع خريطة تفاعلية.
-    في بلديات{" "}
-  </Highlight>
-
-  <LayoutTextFlip words={elOuedCommunes} />
-
-</div>
- 
-</motion.div>
-  
-</div>
-
-        {/* Description */}
-     
-
-
-        {/* Buttons */}
-       
-     <div className="flex justify-center mt-12 items-center  gap-2"> 
- {/* أعدنا استخدام Link وأضفنا له فحص onClick */}
-      <Link to="/dashboard/add" onClick={handlePublishClick}>
-        <HoverBorderGradient
-          containerClassName="rounded-full"
-          className="font-semibold cursor-pointer dark:bg-black bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 dark:text-white flex items-center space-x-2"
-        >
-          <span>نشر إعلان</span>
-        </HoverBorderGradient>
-      </Link>
-       <InteractiveHoverButton 
-       className=" cursor-pointer dark:bg-black bg-black text-white dark:text-white flex items-center space-x-2"
-       >تصفح</InteractiveHoverButton>
+              <LayoutTextFlip words={elOuedCommunes} />
+            </div>
+          </motion.div>
         </div>
 
+        {/* Description */}
 
+        {/* Buttons */}
 
-
-       
+        <div className="flex justify-center mt-12 items-center  gap-2">
+          {/* أعدنا استخدام Link وأضفنا له فحص onClick */}
+          <Link to="/dashboard/add" onClick={handlePublishClick}>
+            <HoverBorderGradient
+              containerClassName="rounded-full"
+              className="font-semibold cursor-pointer dark:bg-black bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 dark:text-white flex items-center space-x-2"
+            >
+              <span>نشر إعلان</span>
+            </HoverBorderGradient>
+          </Link>
+          {!isStandalone && (
+            <LiquidButton
+              onClick={handleInstallClick}
+              className="text-sm   cursor-pointer"
+            >
+    <Download 
+    color="yellow"
+    className="w-4 h-4" 
+    />     
+             <span>حمّل التطبيق الآن</span>
+            </LiquidButton>
+          )}
+        </div>
       </motion.div>
 
       {/* Stats */}
-      
-  
-     
-
-  
     </div>
-  )
+  );
 }
- 

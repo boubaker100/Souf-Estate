@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useAuth } from "@clerk/clerk-react";
+import { toast } from "sonner";
+import { useSavedPostIds, useToggleSavedPost } from "@/hooks/useSavedPosts";
 import { getImageUrl } from "@/lib/getImageUrl";
 import { formatPrice } from "@/lib/formatPrice";
-import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
 import { formatDistanceToNowStrict } from "date-fns";
 import { ar } from "date-fns/locale";
 import {
@@ -32,6 +34,7 @@ import {
   Zap,
   Droplets,
 } from "lucide-react";
+import { useState, useRef, useCallback } from "react";
 
 // ===================== قواميس التسميات =====================
 const PROPERTY_LABELS = {
@@ -84,9 +87,16 @@ const getAreaLabel = (post) => {
 // ملاحظة: تم حذف "حالة العقار"، "عدد الحمامات"، "بنية العقار"، "الخزان الأرضي"،
 // "رابط الفيديو" و "الوثائق" من هذا الكارد المبسّط بطلب من صاحب المنتج،
 // على أن تبقى متاحة في صفحة تفاصيل العقار الكاملة.
-export default function PropertyCard({ post, isOwner = false, onDelete }) {
-  const [isFavorite, setIsFavorite] = useState(false);
+export default function PropertyCard({ post, isOwner = false, onDelete, showSaveActions = false }) {
+  const { isSignedIn } = useAuth();
+  const navigate = useNavigate();
+  const { savedIds } = useSavedPostIds();
+  const toggleSaved = useToggleSavedPost();
+  const isFavorite = savedIds.has(post.id);
+  const savingFavorite = toggleSaved.isLoading;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const imgRef = useRef(null);
+  const decodingRef = useRef(false);
 
   const images =
     post.images && post.images.length > 0
@@ -194,19 +204,82 @@ export default function PropertyCard({ post, isOwner = false, onDelete }) {
       : "hover:bg-blue-600 hover:text-white",
   };
 
-  const goToImage = (e, index) => {
+  const preloadImage = useCallback((src) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = src;
+      img.decode?.().then(resolve).catch(resolve);
+    });
+  }, []);
+
+  const goToImage = useCallback(async (e, index) => {
     e.preventDefault();
     e.stopPropagation();
-    setCurrentImageIndex(index);
-  };
+    if (decodingRef.current || index === currentImageIndex) return;
+    decodingRef.current = true;
+    try {
+      await preloadImage(getImageUrl(images[index]));
+    } finally {
+      decodingRef.current = false;
+      setCurrentImageIndex(index);
+    }
+  }, [currentImageIndex, images, preloadImage]);
 
-  const nextImage = (e) =>
-    goToImage(e, (currentImageIndex + 1) % images.length);
-  const prevImage = (e) =>
-    goToImage(e, (currentImageIndex - 1 + images.length) % images.length);
+  const nextImage = useCallback(
+    (e) => goToImage(e, (currentImageIndex + 1) % images.length),
+    [currentImageIndex, images, goToImage]
+  );
+  const prevImage = useCallback(
+    (e) => goToImage(e, (currentImageIndex - 1 + images.length) % images.length),
+    [currentImageIndex, images, goToImage]
+  );
 
   const ImageTag = isOwner ? "div" : Link;
   const imageTagProps = isOwner ? {} : { to: `/${post.id}` };
+
+  const handleShare = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const shareUrl = `${window.location.origin}/${post.id}`;
+    const shareData = {
+      title: post.title || "عقار للبيع",
+      text: post.description?.slice(0, 100) || "شاهد هذا العقار",
+      url: shareUrl,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("تم نسخ رابط الإعلان");
+      }
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        toast.error("تعذر مشاركة الرابط");
+      }
+    }
+  };
+
+  const handleSaveToggle = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isSignedIn) {
+      toast.info("يرجى تسجيل الدخول لحفظ الإعلان");
+      navigate("/sign-in");
+      return;
+    }
+
+    if (savingFavorite) return;
+
+    try {
+      const serverSaved = await toggleSaved.mutateAsync(post.id);
+      toast.success(serverSaved ? "تم حفظ الإعلان" : "تم إلغاء الحفظ");
+    } catch (err) {
+      const msg = err?.response?.data?.message || "فشل حفظ الإعلان";
+      toast.error(msg);
+    }
+  };
 
   return (
     <motion.div
@@ -221,18 +294,18 @@ export default function PropertyCard({ post, isOwner = false, onDelete }) {
         {...imageTagProps}
         className="relative h-56 bg-gray-100 overflow-hidden group block"
       >
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={currentImageIndex}
-            src={getImageUrl(images[currentImageIndex])}
-            alt={post.title}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="w-full h-full object-cover"
-            onError={(e) => { e.currentTarget.src = "/souf.webp"; }}
-          />
-        </AnimatePresence>
+        <img
+          ref={imgRef}
+          src={getImageUrl(images[currentImageIndex])}
+          alt={post.title}
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover transition-opacity duration-200 ease-out"
+          style={{ opacity: 1 }}
+          onError={(e) => {
+            e.currentTarget.src = "/souf.webp";
+          }}
+        />
 
         {images.length > 1 && (
           <>
@@ -315,30 +388,26 @@ export default function PropertyCard({ post, isOwner = false, onDelete }) {
             </div>
           ))}
 
-        {!isOwner && (
+        {(!isOwner || showSaveActions) && (
           <div className="absolute top-3 left-3 flex gap-2 z-20">
+            {!isOwner && (
+              <button
+                onClick={handleSaveToggle}
+                disabled={savingFavorite}
+                className={`p-2 rounded-full backdrop-blur-md active:scale-90 transition-all duration-200 shadow-[0_2px_6px_rgba(0,0,0,0.12)] ${
+                  isFavorite
+                    ? "bg-red-500 text-white"
+                    : "bg-white/90 text-gray-700 hover:bg-white"
+                }`}
+              >
+                <Heart
+                  className="w-4 h-4"
+                  fill={isFavorite ? "currentColor" : "none"}
+                />
+              </button>
+            )}
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsFavorite(!isFavorite);
-              }}
-              className={`p-2 rounded-full backdrop-blur-md active:scale-90 transition-all duration-200 shadow-[0_2px_6px_rgba(0,0,0,0.12)] ${
-                isFavorite
-                  ? "bg-red-500 text-white"
-                  : "bg-white/90 text-gray-700 hover:bg-white"
-              }`}
-            >
-              <Heart
-                className="w-4 h-4"
-                fill={isFavorite ? "currentColor" : "none"}
-              />
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
+              onClick={handleShare}
               className="p-2 rounded-full bg-white/90 text-gray-700 hover:bg-white active:scale-90 backdrop-blur-md transition-all duration-200 shadow-[0_2px_6px_rgba(0,0,0,0.12)]"
             >
               <Share2 className="w-4 h-4" />
@@ -373,7 +442,7 @@ export default function PropertyCard({ post, isOwner = false, onDelete }) {
           </div>
 
           <h3
-            className="mt-12 text-lg font-bold text-gray-900 line-clamp-1"
+            className="mt-12 lg:mt-3 text-lg font-bold text-gray-900 line-clamp-1"
             title={hasValue(post.title) ? post.title : "عنوان غير محدد"}
           >
             {hasValue(post.title)

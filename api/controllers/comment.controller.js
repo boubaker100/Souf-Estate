@@ -13,7 +13,7 @@ export const getComments = async (req, res, next) => {
       orderBy: { createdAt: "asc" },
       include: {
         user: {
-          select: { id: true, username: true, avatar: true },
+          select: { id: true, username: true, avatar: true, clerkId: true },
         },
       },
     });
@@ -83,7 +83,7 @@ export const addComment = async (req, res, next) => {
       },
       include: {
         user: {
-          select: { id: true, username: true, avatar: true },
+          select: { id: true, username: true, avatar: true, clerkId: true },
         },
       },
     });

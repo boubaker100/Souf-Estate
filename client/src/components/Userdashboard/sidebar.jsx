@@ -7,12 +7,14 @@ import {
   Settings,
   Menu,
   X,
-  PlusCircle
+  PlusCircle,
+  Bookmark
 } from "lucide-react";
 
 const userLinks = [
   { to: "/dashboard/add", label: "نشر إعلان جديد", icon: PlusCircle },
   { to: "/dashboard/my-posts", label: "إعلاناتي", icon: FileText },
+  { to: "/dashboard/saved", label: "الإعلانات المحفوظة", icon: Bookmark },
   { to: "/account", label: "إعدادات الحساب", icon: Settings },
 ];
 
@@ -99,10 +101,10 @@ export default function Sidebar({ role, collapsed, setCollapsed, mobileOpen, set
 
             {/* تغيير right-0 إلى left-0 وتعديل x ليفتح من اليسار (-100%) */}
             <motion.div
-              className="fixed left-0 top-0 bottom-0 w-72 bg-white dark:bg-gray-800 z-50 shadow-2xl p-5 lg:hidden flex flex-col"
-              initial={{ x: "-100%" }}
+              className="fixed right-0 top-0 bottom-0 w-72 bg-white dark:bg-gray-800 z-50 shadow-2xl p-5 lg:hidden flex flex-col"
+              initial={{ x: "100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
+              exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
             >
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-700">

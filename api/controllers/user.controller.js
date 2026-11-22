@@ -104,6 +104,14 @@ export const savePost = async (req, res) => {
   const { postId } = req.body;
 
   try {
+    const post = await prisma.post.findUnique({ where: { id: postId } });
+    if (!post) {
+      return res.status(404).json({ message: "الإعلان غير موجود" });
+    }
+    if (post.userId === userId) {
+      return res.status(403).json({ message: "لا يمكنك حفظ إعلانك الخاص" });
+    }
+
     const savedPost = await prisma.savedPost.findUnique({
       where: { userId_postId: { userId, postId } },
     });

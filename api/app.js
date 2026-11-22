@@ -38,49 +38,26 @@ app.set("trust proxy", 1);
 // CLIENT_URL مثال:
 // http://localhost:5173,https://your-project.vercel.app
 
-const allowedOrigins = (
-  process.env.CLIENT_URL || "http://localhost:5173"
-)
-  .split(",")
-  .map((origin) => origin.trim().replace(/\/$/, ""))
-  .filter(Boolean);
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'https://souf-estate.vercel.app',
+];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // السماح للطلبات التي لا تحتوي على Origin
-      // مثل بعض طلبات السيرفرات وأدوات الاختبار
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      const normalizedOrigin = origin.replace(/\/$/, "");
-
-      if (allowedOrigins.includes(normalizedOrigin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("Not allowed by CORS"));
-    },
-
-    credentials: true,
-
-    methods: [
-      "GET",
-      "POST",
-      "PUT",
-      "PATCH",
-      "DELETE",
-      "OPTIONS",
-    ],
-
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "Cookie",
-    ],
-  })
-);
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Accept'],
+}));
 
 // ============================================================
 // Security Headers
@@ -162,6 +139,14 @@ app.use("/api/posts", postRoute);
 // ============================================================
 
 app.use((err, req, res, next) => {
+  // Manually add CORS headers in case of error so the browser
+  // can read the real error body instead of masking it as a CORS failure.
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+  }
+
   console.error("🔥 Error Log:", err.message);
 
   res.status(err.status || 500).json({

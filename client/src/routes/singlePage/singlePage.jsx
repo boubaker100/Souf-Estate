@@ -1,10 +1,11 @@
 import { useNavigate, useLoaderData } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { Maximize2, X, Bookmark, BookmarkCheck } from "lucide-react";
 import apiRequest from "../../lib/apiRequest";
 import { formatPrice } from "@/lib/formatPrice";
+import { useSavedPostIds, useToggleSavedPost } from "@/hooks/useSavedPosts";
 import PostsMap from "@/components/map/PostsMap";
 import ImageCarousel from "@/components/carousel-09";
 import CommentSection from "@/components/comments/CommentSection";
@@ -75,11 +76,18 @@ const isYes = (v) => v === "yes" || v === true || v === "true";
 
 function SinglePage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const response = useLoaderData();
   const post = response?.data || response;
-  const [saved, setSaved] = useState(post?.isSaved);
+  const { savedIds } = useSavedPostIds();
+  const toggleSaved = useToggleSavedPost();
+  const saved = savedIds.has(post?.id);
+  const isSaving = toggleSaved.isLoading;
   const { isSignedIn } = useAuth();
+  const { user: clerkUser } = useUser();
+  const isOwner = !!clerkUser?.id && clerkUser.id === post?.user?.clerkId;
+  const avatarSrc = isOwner
+    ? (clerkUser?.imageUrl || "/noavatar.jpg")
+    : (post?.user?.avatar || "/noavatar.jpg");
   const navigate = useNavigate();
 
   const [copied, setCopied] = useState(false);
@@ -116,27 +124,6 @@ function SinglePage() {
     apiRequest.post(`/api/posts/${post.id}/view`).catch(() => {});
   }, [post?.id]);
 
-  // جلب حالة الحفظ الحالية للمستخدم (لعرض "تم الحفظ" عند التحميل)
-  useEffect(() => {
-    if (!isSignedIn || !post?.id) {
-      setSaved(false);
-      return;
-    }
-    let cancelled = false;
-    apiRequest
-      .get("/api/dashboard/saved")
-      .then((res) => {
-        const ids = (res.data?.data || []).map((p) => p.id);
-        if (!cancelled) setSaved(ids.includes(post.id));
-      })
-      .catch(() => {
-        if (!cancelled) setSaved(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [isSignedIn, post?.id]);
-
   if (!post) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -147,24 +134,17 @@ function SinglePage() {
 
   const handleSave = async () => {
     if (!isSignedIn) return navigate("/sign-in");
-    setIsSaving(true);
-    const previous = saved;
-    setSaved(!previous); // optimistic
+    if (isSaving) return;
     try {
-      const res = await apiRequest.post(`/api/dashboard/saved/${post.id}`);
-      const nextSaved = res.data?.saved ?? !previous;
-      setSaved(nextSaved);
+      const nextSaved = await toggleSaved.mutateAsync(post.id);
       toast.success(nextSaved ? "تم حفظ الإعلان" : "تم إلغاء الحفظ");
     } catch (err) {
-      setSaved(previous); // revert
       const msg =
         err?.response?.data?.message ||
         err?.message ||
         "فشل حفظ الإعلان";
       toast.error(msg);
       console.error("Save error:", err);
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -271,15 +251,16 @@ function SinglePage() {
       {/* القسم الرئيسي */}
       <div className="flex-1 p-4 lg:p-8 overflow-y-auto">
         <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-          <ImageCarousel images={post.images} />
+          <ImageCarousel images={Array.isArray(post.images) && post.images.length > 0 ? post.images : ["/souf.webp"]} />
 
           <div className="p-6 md:p-10">
             {/* بطاقة المعلن */}
             <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl mb-8 border border-gray-100">
               <img
-                src={post.user?.avatar || "/noavatar.jpg"}
+                src={avatarSrc}
                 alt="user"
                 className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm"
+                onError={(e) => { e.currentTarget.src = "/noavatar.jpg"; }}
               />
               <div className=" gap-2">
                 <p className="font-bold text-gray-800">

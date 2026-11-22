@@ -115,7 +115,7 @@ const Footer = () => {
 
               
                     {/* العمود 3: معلومات التواصل */}
-                    <motion.div variants={itemVariants} className="lg:col-span-3">
+                    <motion.div variants={itemVariants} className="lg:col-span-4">
                         <h3 className="text-lg font-semibold text-white mb-5">معلومات التواصل</h3>
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3 group">

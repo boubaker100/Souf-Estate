@@ -5,6 +5,7 @@ import { Suspense } from "react";
 // ================= LOADERS =================
 import { singlePageLoader } from "./lib/loaders";
 import MyPostsPage from "./routes/UserDashboard/MyPostPage";
+import SavedPostsPage from "./routes/UserDashboard/SavedPostsPage";
 import AdminRoute from "./routes/AdminDashboard/AdminRoute";
 import EditPostPage from "./routes/UserDashboard/EditPostPage";
 import { Layout } from "./routes/layout/layout";
@@ -64,6 +65,7 @@ function App() {
       children: [
         { index: true, element: <MyPostsPage/> },
         { path: "my-posts", element: <MyPostsPage /> },
+        { path: "saved", element: <SavedPostsPage /> },
         { path: "edit/:id", element: <EditPostPage /> },
         { path: "add", element: <NewPostPage/> }, // الآن أصبح محمي تلقائياً!
       ],

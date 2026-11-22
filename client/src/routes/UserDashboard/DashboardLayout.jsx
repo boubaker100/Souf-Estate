@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 
 // 1. استدعاء الناف بار الأصلي للموقع بدلاً من هيدر الداشبورد
+import { Menu, ChevronLeft } from "lucide-react";
 import Navbar from "../../components/navbar/Navbar";
 import Sidebar from "@/components/Userdashboard/sidebar";
 import ToastProvider from "@/components/Userdashboard/toastProvider";
@@ -13,11 +14,27 @@ export default function DashboardLayout() {
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col">
+      <div className="top-50 min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col">
         
         {/* 2. وضعنا الناف بار الأصلي هنا في الأعلى مع تثبيته (sticky) */}
-        <header className="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 w-full">
-          <Navbar /> 
+        <header className="pt-12 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 w-full">
+          <Navbar />
+
+          {/* Mobile-only dashboard menu button */}
+          <div className="lg:hidden sticky top-12 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-b border-gray-200 dark:border-gray-700">
+            <button
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="فتح قائمة لوحة التحكم"
+            >
+              <span className="flex items-center gap-2">
+                <Menu className="w-5 h-5" />
+                قائمة لوحة التحكم
+              </span>
+              <ChevronLeft className="w-4 h-4 opacity-60" />
+            </button>
+          </div>
         </header>
 
         {/* حاوية السايد بار والمحتوى */}
@@ -36,7 +53,7 @@ export default function DashboardLayout() {
             وتغيير lg:mr-64 إلى lg:ml-64 
             لكي نترك مساحة فارغة من ناحية اليسار للسايد بار 
           */}
-          <div className={`flex-1 flex flex-col transition-all duration-300 ${collapsed ? 'lg:ml-20' : 'lg:ml-64'}`}>
+          <div className={` flex-1 flex flex-col transition-all duration-300 ${collapsed ? 'lg:ml-20' : 'lg:ml-64'}`}>
             <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
               <motion.div
                 initial={{ opacity: 0, y: 8 }}

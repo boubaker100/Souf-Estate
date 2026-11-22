@@ -204,3 +204,15 @@
     @apply font-sans;
   }
 }
+@keyframes kenburns-down {
+  0% {
+    transform: scale(1.15) translateY(-5%);
+  }
+  100% {
+    transform: scale(1.15) translateY(5%);
+  }
+}
+
+.kenburns-down {
+  animation: kenburns-down 15s ease-out both;
+}

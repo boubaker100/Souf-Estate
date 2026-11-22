@@ -68,6 +68,10 @@ export default function MyPostsPage() {
   }, [page, limit, search, sort]);
 
   useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts, refreshKey]);
+
+  useEffect(() => {
     if (location.state?.newPost) {
       toast.success("تم نشر إعلانك بنجاح!");
       setRefreshKey((prev) => prev + 1);
@@ -142,18 +146,12 @@ export default function MyPostsPage() {
             حدث خطأ أثناء التحميل
           </h3>
           <p className="text-sm text-gray-500">{error}</p>
-          <div className="flex items-center justify-center gap-3">
+<div className="flex items-center justify-center gap-3">
             <button
               onClick={() => setRefreshKey((prev) => prev + 1)}
               className="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-xl text-sm"
             >
-              <RefreshCw size={16} />عادة المحاولة
-            </button>
-            <button
-              onClick={() => window.location.reload()}
-              className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-xl text-sm"
-            >
-              <RefreshCw size={16} />إعادة تحميل-page
+              <RefreshCw size={16} />إعادة المحاولة
             </button>
           </div>
         </div>
@@ -183,6 +181,7 @@ export default function MyPostsPage() {
                 <PropertyCard
                   post={post}
                   isOwner={true}
+                  showSaveActions={true}
                   onDelete={handleDelete}
                 />
               </Link>

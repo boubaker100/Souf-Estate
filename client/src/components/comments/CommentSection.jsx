@@ -167,6 +167,12 @@ function CommentItem({
   submitting,
 }) {
   const isOwn = comment.isOwn === true;
+  const { user: clerkUser } = useUser();
+  const isOwnComment = !!clerkUser?.id && clerkUser.id === comment?.user?.clerkId;
+  const fallbackInitials = `https://ui-avatars.com/api/?name=${encodeURIComponent(comment?.user?.username || 'U')}&background=facc15&color=0a0a0a&bold=true&size=56`;
+  const avatarSrc = isOwnComment
+    ? (clerkUser?.imageUrl || fallbackInitials)
+    : (comment?.user?.avatar || fallbackInitials);
   const indent = Math.min(depth, MAX_INDENT_DEPTH);
   const timeLabel = comment.createdAt
     ? formatDistanceToNowStrict(new Date(comment.createdAt), { addSuffix: true, locale: ar })
@@ -176,9 +182,10 @@ function CommentItem({
     <div style={{ marginRight: indent * 24 }}>
       <div className="flex items-start gap-3">
         <img
-          src={comment.user?.avatar || "https://placehold.co/100x100?text=User"}
+          src={avatarSrc}
           alt={comment.user?.username}
           className="w-9 h-9 rounded-full object-cover flex-shrink-0 border border-gray-100"
+          onError={(e) => { e.currentTarget.src = "/noavatar.jpg"; }}
         />
         <div className="flex-1 min-w-0">
           <div className="bg-gray-50 rounded-2xl px-4 py-2.5 border border-gray-100">

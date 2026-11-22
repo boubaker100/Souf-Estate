@@ -79,8 +79,8 @@ export default function Navbar() {
       <div className="flex items-center justify-between h-12">
         <div className="flex shrink-0">
           <Link to="/" className="flex items-center h-10">     
-            {isFixed ?  <img src="/LOGO4.png" className="w-auto h-full" alt="Logo" /> 
-            :            <img src="/LOGO3.png" className="w-auto h-full" alt="Logo" /> }
+            {isFixed ?  <img src="/LOGO4.png" className="w-auto h-full" alt="Logo" width="187" height="40" fetchpriority="high" /> 
+            :            <img src="/LOGO3.png" className="w-auto h-full" alt="Logo" width="187" height="40" fetchpriority="high" /> }
           </Link>
         </div>
 
@@ -111,7 +111,7 @@ export default function Navbar() {
                     <img 
                       src={user?.imageUrl} 
                       alt={user?.firstName || "Profile"} 
-                      className="w-8 h-8 rounded-full border-2 transform-stroke transition-all  border-yellow-400 object-cover" 
+                      className="w-8 h-8 rounded-full border-2 transform-stroke transition-all  border-yellow-500 object-cover" 
                     />
                     <span className={`hidden lg:inline text-sm font-medium ${isFixed ? "text-gray-900" : "text-white"}`}>
                         {user?.firstName}
@@ -125,7 +125,7 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 rtl:left-0 mt-2 w-56 rounded-xl bg-white dark:bg-gray-800 shadow-2xl border border-gray-100 dark:border-gray-700 py-2 z-[100] text-gray-800 dark:text-gray-200 origin-top-right rtl:origin-top-left"
+                      className="absolute right-0 rtl:left-0 mt-5 w-56 rounded-xl bg-white dark:bg-gray-800 shadow-2xl border border-gray-100 dark:border-gray-700 py-2 z-[100] text-gray-800 dark:text-gray-200 origin-top-right rtl:origin-top-left"
                     >
                       <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700 mb-1">
                         <p className="text-xs text-gray-500 dark:text-gray-400">مسجل بواسطة</p>
@@ -156,7 +156,7 @@ export default function Navbar() {
                             signOut()
                             closeProfileMenu()
                           }}
-                          className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                         >
                           <LogOut size={16} />
                           <span>تسجيل الخروج</span>
@@ -228,41 +228,43 @@ export default function Navbar() {
             />
             <motion.div 
               initial="hidden" animate="visible" exit="exit" variants={sidebarVariants} 
-              className="fixed right-0 top-0 bottom-0 w-64 bg-gray-900 z-[70] lg:hidden overflow-y-auto shadow-2xl"
+              className="fixed right-0 top-0 bottom-0 w-64 bg-[linear-gradient(to_right,#a23100,#F9D423)] z-[70] lg:hidden overflow-y-auto shadow-2xl"
             >
               <div className="flex items-center justify-between p-4 border-b border-white/10">
                 <h3 className="text-white font-bold">القائمة</h3>
-                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-white" aria-label="إغلاق القائمة"><X className="w-6 h-6" /></button>
+                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-black" aria-label="إغلاق القائمة"><X className="w-6 h-6" /></button>
               </div>
               <div className="py-4 space-y-2 px-4">
                 {navLinks.map((link, idx) => (
                   <motion.div key={link.href} custom={idx} initial="hidden" animate="visible" variants={menuItemVariants}>
                     <Link to={link.href} onClick={closeSidebar}>
-                      <Button variant="ghost" className="w-full justify-start text-white hover:bg-yellow-400/20 hover:text-yellow-400">
+                      <Button variant="ghost" className="w-full justify-start text-black hover:bg-yellow-400/20 hover:text-yellow-400">
                         {link.label}
                       </Button>
                     </Link>
                   </motion.div>
                 ))}
               </div>
-              <div className="border-t border-white/10 p-4 mt-4">
+              <div className="border-t border-black/10 p-4 mt-4">
                 {isSignedIn ? (
-                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-2 bg-white/5 rounded-lg text-white">
+                   <div className="space-y-5 ">
+                    <div className="flex items-center gap-3 p-2 bg-black/5 rounded-lg text-black">
                       <img src={user?.imageUrl} className="w-10 h-10 rounded-full border border-yellow-400 object-cover" alt="صورة الملف الشخصي" />
                       <div className="truncate"><p className="font-bold">{user?.firstName}</p></div>
                     </div>
+                    <div className="gap-3 flex flex-col">
                     <Link to="/dashboard" onClick={closeSidebar}>
-                       <Button variant="outline" className="w-full text-white border-white/20">لوحة التحكم</Button>
+                       <Button variant="outline" className="w-full text-black border-black/20">لوحة التحكم</Button>
                     </Link>
                     <Link to="/account" onClick={closeSidebar}>
-                       <Button variant="outline" className="w-full text-white border-white/20">الملف الشخصي</Button>
+                       <Button variant="outline" className="w-full text-black border-black/20">الملف الشخصي</Button>
                     </Link>
-                    <Button variant="destructive" className="w-full" onClick={() => { signOut(); setMobileMenuOpen(false); }}>خروج</Button>
+                    <Button variant="destructive" className="w-full mt-40 text-red-600 border border-black bg-yellow-200 hover:bg-yellow-100" onClick={() => { signOut(); setMobileMenuOpen(false); }}>تسجيل الخروج </Button>
+                  </div>
                    </div>
                 ) : (
                   <div className="space-y-3">
-                    <Link to="/sign-in" onClick={closeSidebar}><Button className="w-full border-white/20 text-white bg-transparent font-bold">تسجيل دخول</Button></Link>
+                    <Link to="/sign-in" onClick={closeSidebar}><Button className="w-full border-black/20 text-black bg-transparent font-bold">تسجيل دخول</Button></Link>
                     <Link to="/sign-up" onClick={closeSidebar}><Button className="w-full bg-yellow-400 text-black font-bold">تسجيل حساب</Button></Link>
                   </div>
                 )}

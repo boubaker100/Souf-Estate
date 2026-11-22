@@ -78,7 +78,7 @@ export const getPosts = async (req, res, next) => {
 // ── منشور واحد ──
 export const getPost = async (req, res, next) => {
   try {
-    const post = await prisma.post.findUnique({ where: { id: req.params.id }, include: { user: { select: { username: true, avatar: true } } } });
+    const post = await prisma.post.findUnique({ where: { id: req.params.id }, include: { user: { select: { username: true, avatar: true, clerkId: true } } } });
     if (!post) return res.status(404).json({ success: false, message: "الإعلان غير موجود" });
     res.status(200).json({ success: true, data: post });
   } catch (err) {
