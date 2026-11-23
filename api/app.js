@@ -42,8 +42,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:4173',
   'https://souf-estate.vercel.app',
-  'https://souf-estate.com',
-  'https://www.souf-estate.com'
+  'https://souf-estate.online',
+  'https://www.souf-estate.online',
 ];
 
 app.use(cors({
