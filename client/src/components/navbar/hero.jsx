@@ -196,7 +196,7 @@ export default function HeroTemplate({
           </h1>
 
           <motion.div dir="rtl" className="relative font-extrabold mt-5 ">
-            <div className="flex flex-col md:flex-row justify-center items-center text-md shadow-2xs leading-relaxed">
+            <div className="flex flex-col md:flex-row justify-center items-center text-sm shadow-2xs leading-relaxed">
               <Highlight>
                 ابحث عن عقارات للبيع والكراء بسهولة، مع خريطة تفاعلية. في
                 بلديات{" "}
