@@ -61,6 +61,7 @@ export default function MapPicker({ onSelect, initialPosition }) {
     <MapContainer
       center={center}
       zoom={12}
+      gestureHandling={true}
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />

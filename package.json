@@ -11,5 +11,8 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "@raruto/leaflet-gesture-handling": "^1.6.3"
   }
 }
