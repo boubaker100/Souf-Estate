@@ -4,7 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { rentIcon, buyIcon } from "./mapIcons";
 import { Link } from "react-router-dom";
-import { Phone, MousePointerClick, X } from "lucide-react";
+import { Phone } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 
 // إعداد أيقونات Leaflet الافتراضية
@@ -69,15 +69,13 @@ export default function PostsMap({
       ? [Number(posts[0].latitude), Number(posts[0].longitude)]
       : EL_OUED_CENTER;
 
-  const [isMapActive, setIsMapActive] = useState(false);
-
   return (
-    <div className="relative h-full w-full">
-      <MapContainer
-        center={mapCenter}
-        zoom={10}
-        className={`w-full ${className}  rounded-2xl shadow-md`}
-      >
+    <MapContainer
+      center={mapCenter}
+      zoom={10}
+      gestureHandling={true}
+      className={`w-full ${className}  rounded-2xl shadow-md`}
+    >
         <TileLayer
           attribution="&copy; OpenStreetMap"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -173,31 +171,5 @@ export default function PostsMap({
           </div>
         </div>
       </MapContainer>
-
-      {/* Overlay - only on mobile */}
-      {!isMapActive && (
-        <div
-          className="md:hidden absolute inset-0 z-[400] flex flex-col items-center justify-center bg-black/30 backdrop-blur-[1px] cursor-pointer rounded-xl"
-          onClick={() => setIsMapActive(true)}
-        >
-          <div className="bg-white/95 px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
-            <MousePointerClick className="w-4 h-4 text-gray-700" />
-            <span className="text-sm font-semibold text-gray-800">اضغط للتفاعل مع الخريطة</span>
-          </div>
-        </div>
-      )}
-
-      {/* Close button - only when active, mobile only */}
-      {isMapActive && (
-        <button
-          type="button"
-          className="md:hidden absolute top-2 left-2 z-[400] bg-white/95 hover:bg-white p-2 rounded-full shadow-lg"
-          onClick={() => setIsMapActive(false)}
-          aria-label="إنهاء التفاعل مع الخريطة"
-        >
-          <X className="w-4 h-4 text-gray-700" />
-        </button>
-      )}
-    </div>
-  );
-}
+    );
+  }

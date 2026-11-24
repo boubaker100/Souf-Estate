@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import "leaflet/dist/leaflet.css";
-import 'leaflet/dist/leaflet.css';
 import '@raruto/leaflet-gesture-handling/dist/leaflet-gesture-handling.css';
 import '@raruto/leaflet-gesture-handling';
 import { ClerkProvider } from "@clerk/clerk-react";

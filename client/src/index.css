@@ -216,10 +216,3 @@
 .kenburns-down {
   animation: kenburns-down 15s ease-out both;
 }
-
-/* Allow vertical page scroll over the map on mobile */
-@media (max-width: 767px) {
-  .leaflet-container {
-    touch-action: pan-y !important;
-  }
-}
