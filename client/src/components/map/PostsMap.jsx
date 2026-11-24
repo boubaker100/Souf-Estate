@@ -1,9 +1,10 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { rentIcon, buyIcon } from "./mapIcons";
 import { Link } from "react-router-dom";
-import { Phone } from "lucide-react";
+import { Phone, MousePointerClick, X } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 
 // إعداد أيقونات Leaflet الافتراضية
@@ -68,106 +69,135 @@ export default function PostsMap({
       ? [Number(posts[0].latitude), Number(posts[0].longitude)]
       : EL_OUED_CENTER;
 
+  const [isMapActive, setIsMapActive] = useState(false);
+
   return (
-    <MapContainer
-      center={mapCenter}
-      zoom={10}
-      className={`w-full ${className}  rounded-2xl shadow-md`}
-    >
-      <TileLayer
-        attribution="&copy; OpenStreetMap"
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+    <div className="relative h-full w-full">
+      <MapContainer
+        center={mapCenter}
+        zoom={10}
+        className={`w-full ${className}  rounded-2xl shadow-md`}
+      >
+        <TileLayer
+          attribution="&copy; OpenStreetMap"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
 
-      {/* عرض الـ Markers بناءً على البيانات التي تصل من الأب فقط */}
-      {(posts || [])
-        .filter((post) => post.latitude && post.longitude)
-        .map((post) => {
-          const isRent = post.type === "rent";
-          const primaryPhone = Array.isArray(post.phones) && post.phones.length > 0 ? post.phones[0] : null;
-          const propertyLabel = PROPERTY_LABELS[post.property] || post.property;
+        {/* عرض الـ Markers بناءً على البيانات التي تصل من الأب فقط */}
+        {(posts || [])
+          .filter((post) => post.latitude && post.longitude)
+          .map((post) => {
+            const isRent = post.type === "rent";
+            const primaryPhone = Array.isArray(post.phones) && post.phones.length > 0 ? post.phones[0] : null;
+            const propertyLabel = PROPERTY_LABELS[post.property] || post.property;
 
-          return (
-            <Marker
-              key={post.id}
-              position={[Number(post.latitude), Number(post.longitude)]}
-              icon={isRent ? rentIcon : buyIcon}
-              eventHandlers={{
-                // عند الضغط على العلامة نُعلم المكوّن الأب بالعقار المختار،
-                // ليقوم بتمرير الكارد المطابق إليه في القائمة الجانبية أو الكاروسيل
-                click: () => onMarkerClick && onMarkerClick(post),
-              }}
-            >
-              <Popup minWidth={260} maxWidth={280} className="property-popup">
-                <div dir="rtl">
-                  {/* شريط علوي ملوّن رفيع يحمل نوع الصفقة — يعمل كهوية بصرية للبطاقة
-                      بدل شارة صغيرة، ويطابق لون الماركر مباشرة */}
-                  <div
-                    className={`px-4 py-2.5 flex items-center ${
-                      isRent ? "bg-emerald-600" : "bg-blue-600"
-                    }`}
-                  >
-                    <span className="text-3xl mx-auto font-bold text-white tracking-wide">
-                      {propertyLabel
-                        ? `${propertyLabel} ${isRent ? "للكراء" : "للبيع"}`
-                        : isRent
-                        ? "عقار للكراء"
-                        : "عقار للبيع"}
-                    </span>
-                  </div>
-
-                  <div className="px-4 pt-3 pb-4 space-y-3">
-                    {/* السعر — العنصر الأهم، بحجم أكبر وثقل بصري واضح */}
-                    <div className="flex items-baseline gap-1.5 border-b border-gray-100 pb-3">
-                      <span className="text-2xl font-black text-gray-900 leading-none">
-                        {formatPrice(post.price)}
+            return (
+              <Marker
+                key={post.id}
+                position={[Number(post.latitude), Number(post.longitude)]}
+                icon={isRent ? rentIcon : buyIcon}
+                eventHandlers={{
+                  // عند الضغط على العلامة نُعلم المكوّن الأب بالعقار المختار،
+                  // ليقوم بتمرير الكارد المطابق إليه في القائمة الجانبية أو الكاروسيل
+                  click: () => onMarkerClick && onMarkerClick(post),
+                }}
+              >
+                <Popup minWidth={260} maxWidth={280} className="property-popup">
+                  <div dir="rtl">
+                    {/* شريط علوي ملوّن رفيع يحمل نوع الصفقة — يعمل كهوية بصرية للبطاقة
+                        بدل شارة صغيرة، ويطابق لون الماركر مباشرة */}
+                    <div
+                      className={`px-4 py-2.5 flex items-center ${
+                        isRent ? "bg-emerald-600" : "bg-blue-600"
+                      }`}
+                    >
+                      <span className="text-3xl mx-auto font-bold text-white tracking-wide">
+                        {propertyLabel
+                          ? `${propertyLabel} ${isRent ? "للكراء" : "للبيع"}`
+                          : isRent
+                          ? "عقار للكراء"
+                          : "عقار للبيع"}
                       </span>
-                      {isRent && post.rentPeriod && (
-                        <span className="text-xs font-medium text-gray-400">
-                          {RENT_PERIOD_SUFFIX[post.rentPeriod] || ""}
-                        </span>
-                      )}
                     </div>
 
-                    {/* رقم الهاتف — صف مستقل بخلفية هادئة بدل نص عادي معلّق */}
-                    {primaryPhone && (
-                      <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
-                        <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                        <span
-                          className="text-sm font-bold text-gray-700"
-                          dir="ltr"
-                        >
-                          {primaryPhone}
+                    <div className="px-4 pt-3 pb-4 space-y-3">
+                      {/* السعر — العنصر الأهم، بحجم أكبر وثقل بصري واضح */}
+                      <div className="flex items-baseline gap-1.5 border-b border-gray-100 pb-3">
+                        <span className="text-2xl font-black text-gray-900 leading-none">
+                          {formatPrice(post.price)}
                         </span>
+                        {isRent && post.rentPeriod && (
+                          <span className="text-xs font-medium text-gray-400">
+                            {RENT_PERIOD_SUFFIX[post.rentPeriod] || ""}
+                          </span>
+                        )}
                       </div>
-                    )}
 
-                    {/* زر عرض التفاصيل — عريض وبثقل بصري واضح كإجراء رئيسي للبطاقة */}
-                    <Link
-                      to={`/${post.id}`}
-                      style={{ color: "white" }}
-                      className="block w-full text-center bg-gray-900 hover:bg-gray-800 text-black py-2.5 rounded-lg text-sm font-bold shadow-sm transition-colors duration-200"
-                    >
-                      عرض التفاصيل الكاملة
-                    </Link>
+                      {/* رقم الهاتف — صف مستقل بخلفية هادئة بدل نص عادي معلّق */}
+                      {primaryPhone && (
+                        <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
+                          <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                          <span
+                            className="text-sm font-bold text-gray-700"
+                            dir="ltr"
+                          >
+                            {primaryPhone}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* زر عرض التفاصيل — عريض وبثقل بصري واضح كإجراء رئيسي للبطاقة */}
+                      <Link
+                        to={`/${post.id}`}
+                        style={{ color: "white" }}
+                        className="block w-full text-center bg-gray-900 hover:bg-gray-800 text-black py-2.5 rounded-lg text-sm font-bold shadow-sm transition-colors duration-200"
+                      >
+                        عرض التفاصيل الكاملة
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              </Popup>
-            </Marker>
-          );
-        })}
+                </Popup>
+              </Marker>
+            );
+          })}
 
-      {/* مفتاح الخريطة */}
-      <div className="absolute bottom-6 left-6 bg-white p-3 rounded-xl shadow-md z-0 text-sm">
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-emerald-600 rounded-full"></span>
-          <span>كراء</span>
+        {/* مفتاح الخريطة */}
+        <div className="absolute bottom-6 left-6 bg-white p-3 rounded-xl shadow-md z-0 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-emerald-600 rounded-full"></span>
+            <span>كراء</span>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="w-3 h-3 bg-blue-600 rounded-full"></span>
+            <span>بيع</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2 mt-2">
-          <span className="w-3 h-3 bg-blue-600 rounded-full"></span>
-          <span>بيع</span>
+      </MapContainer>
+
+      {/* Overlay - only on mobile */}
+      {!isMapActive && (
+        <div
+          className="md:hidden absolute inset-0 z-[400] flex flex-col items-center justify-center bg-black/30 backdrop-blur-[1px] cursor-pointer rounded-xl"
+          onClick={() => setIsMapActive(true)}
+        >
+          <div className="bg-white/95 px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
+            <MousePointerClick className="w-4 h-4 text-gray-700" />
+            <span className="text-sm font-semibold text-gray-800">اضغط للتفاعل مع الخريطة</span>
+          </div>
         </div>
-      </div>
-    </MapContainer>
+      )}
+
+      {/* Close button - only when active, mobile only */}
+      {isMapActive && (
+        <button
+          type="button"
+          className="md:hidden absolute top-2 left-2 z-[400] bg-white/95 hover:bg-white p-2 rounded-full shadow-lg"
+          onClick={() => setIsMapActive(false)}
+          aria-label="إنهاء التفاعل مع الخريطة"
+        >
+          <X className="w-4 h-4 text-gray-700" />
+        </button>
+      )}
+    </div>
   );
 }
