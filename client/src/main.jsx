@@ -4,10 +4,9 @@ import App from "./App.jsx";
 import "./index.css";
 import "leaflet/dist/leaflet.css";
 import { ClerkProvider } from "@clerk/clerk-react";
-import { QueryClientProvider,QueryClient } from "@tanstack/react-query";
-import { Toaster } from "./components/ui/sonner.jsx";
-import apiRequest from "./lib/apiRequest";
-  
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { useRegisterSW } from "virtual:pwa-register/react";
+
 const queryClient = new QueryClient();
 // Import your Publishable Key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
@@ -25,18 +24,28 @@ function RenderWarmer() {
   return null;
 }
 
+// Auto-update SW without prompt
+function SWRegister() {
+  useRegisterSW({
+    onNeedRefresh() {
+      // Auto-reload when new content is available
+      window.location.reload();
+    },
+    onOfflineReady() {
+      console.log("App ready to work offline");
+    },
+  });
+  return null;
+}
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <RenderWarmer />
     <QueryClientProvider client={queryClient}> 
-      
-   
         <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-           
+            <SWRegister />
             <App />
-          
         </ClerkProvider> 
-        
-        </QueryClientProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );
