@@ -31,7 +31,7 @@ export function InteractiveMapWrapper({ children, className = "", height }) {
 
       {!isActive && (
         <div
-          className="md:hidden absolute inset-0 z-[9999] flex items-center justify-center bg-black/10 cursor-pointer"
+         className="md:hidden absolute inset-0 z-[9999] flex items-end justify-center pb-4 bg-black/10 cursor-pointer"
           style={{ touchAction: "pan-y" }}
           onClick={() => setIsActive(true)}
         >
