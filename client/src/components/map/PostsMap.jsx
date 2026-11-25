@@ -6,6 +6,7 @@ import { rentIcon, buyIcon } from "./mapIcons";
 import { Link } from "react-router-dom";
 import { Phone } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
+import { InteractiveMapWrapper } from "./InteractiveMapWrapper";
 
 // إعداد أيقونات Leaflet الافتراضية
 delete L.Icon.Default.prototype._getIconUrl;
@@ -70,12 +71,12 @@ export default function PostsMap({
       : EL_OUED_CENTER;
 
   return (
-    <MapContainer
-      center={mapCenter}
-      zoom={10}
-      gestureHandling={true}
-      className={`w-full ${className}  rounded-2xl shadow-md`}
-    >
+    <InteractiveMapWrapper className="w-full h-full">
+      <MapContainer
+        center={mapCenter}
+        zoom={10}
+        className={`w-full ${className}  rounded-2xl shadow-md`}
+      >
         <TileLayer
           attribution="&copy; OpenStreetMap"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -171,5 +172,6 @@ export default function PostsMap({
           </div>
         </div>
       </MapContainer>
-    );
+    </InteractiveMapWrapper>
+  );
   }

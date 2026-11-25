@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { useState, useEffect } from "react";
 import "leaflet/dist/leaflet.css";
+import { InteractiveMapWrapper } from "@/components/map/InteractiveMapWrapper";
 
 const isValidLatLng = (lat, lng) => {
   const nLat = Number(lat);
@@ -58,14 +59,15 @@ export default function MapPicker({ onSelect, initialPosition }) {
   }, [initialPosition]);
 
   return (
-    <MapContainer
-      center={center}
-      zoom={12}
-      gestureHandling={true}
-      style={{ height: "100%", width: "100%" }}
-    >
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      <LocationMarker onSelect={onSelect} initialPosition={initialPosition} />
-    </MapContainer>
+    <InteractiveMapWrapper className="w-full h-full">
+      <MapContainer
+        center={center}
+        zoom={12}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <LocationMarker onSelect={onSelect} initialPosition={initialPosition} />
+      </MapContainer>
+    </InteractiveMapWrapper>
   );
 }
