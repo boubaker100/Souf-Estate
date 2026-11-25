@@ -1,4 +1,3 @@
-
 import axios from "axios";
 
 const apiRequest = axios.create({
@@ -8,23 +7,38 @@ const apiRequest = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 60000, // 60s — يكفي للاستيقاظ Cold-start على Render مجاناً
+  timeout: 60000,
 });
+
+// ✅ إضافة Clerk Bearer Token لكل طلب
+apiRequest.interceptors.request.use(
+  async (config) => {
+    try {
+      if (typeof window !== "undefined" && window.Clerk?.session) {
+        const token = await window.Clerk.session.getToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to attach Clerk token:", err);
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 // معالجة الاستجابات غير المتوقعة
 apiRequest.interceptors.response.use(
-  response => response,
-  error => {
+  (response) => response,
+  (error) => {
     if (
       error.response?.data &&
       typeof error.response.data === "string" &&
       error.response.data.startsWith("<!DOCTYPE")
     ) {
-      return Promise.reject(
-        new Error("فشل الاتصال – تأكد من تسجيل الدخول")
-      );
+      return Promise.reject(new Error("فشل الاتصال – تأكد من تسجيل الدخول"));
     }
-
     return Promise.reject(error);
   }
 );
