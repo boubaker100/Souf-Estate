@@ -228,7 +228,7 @@ export default function Navbar() {
             />
             <motion.div 
               initial="hidden" animate="visible" exit="exit" variants={sidebarVariants} 
-              className="fixed right-0 top-0 bottom-0 w-64 bg-[linear-gradient(to_right,#a23100,#F9D423)] z-[70] lg:hidden overflow-y-auto shadow-2xl"
+              className="fixed right-0 top-0 bottom-0 w-64 bg-[linear-gradient(to_bottom,#BA8B02,#181818)] z-[70] lg:hidden overflow-y-auto shadow-2xl"
             >
               <div className="flex items-center justify-between p-4 border-b border-white/10">
                 <h3 className="text-white font-bold">القائمة</h3>
@@ -259,7 +259,7 @@ export default function Navbar() {
                     <Link to="/account" onClick={closeSidebar}>
                        <Button variant="outline" className="w-full text-black border-black/20">الملف الشخصي</Button>
                     </Link>
-                    <Button variant="destructive" className="w-full mt-40 text-red-600 border border-black bg-yellow-200 hover:bg-yellow-100" onClick={() => { signOut(); setMobileMenuOpen(false); }}>تسجيل الخروج </Button>
+                    <Button variant="destructive"className=" w-full bottom-0 text-red-600 border border-black bg-yellow-200 hover:bg-yellow-100" onClick={() => { signOut(); setMobileMenuOpen(false); }}>تسجيل الخروج </Button>
                   </div>
                    </div>
                 ) : (
