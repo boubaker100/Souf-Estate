@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { useRegisterSW } from "virtual:pwa-register/react";
+import apiRequest from "./lib/apiRequest.js";
 
 const queryClient = new QueryClient();
 // Import your Publishable Key

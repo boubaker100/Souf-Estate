@@ -1,27 +1,31 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 
 // ================= LOADERS =================
 import { singlePageLoader } from "./lib/loaders";
-import MyPostsPage from "./routes/UserDashboard/MyPostPage";
-import SavedPostsPage from "./routes/UserDashboard/SavedPostsPage";
-import AdminRoute from "./routes/AdminDashboard/AdminRoute";
-import EditPostPage from "./routes/UserDashboard/EditPostPage";
 import { Layout } from "./routes/layout/layout";
 import HomePage from "./routes/homePage/homePage";
-import Account from "./routes/account/Account";
-import NewPostPage from "./routes/UserDashboard/newPostPage";
-import SinglePage from "./routes/singlePage/singlePage";
-import SignInPage from "./routes/auth/signInPage";
-import SignUpPage from "./routes/auth/signUpPage";
-import Page from "./components/dashboard/page";
-import UsersTable from "./components/dashboard/components/UsersTable";
-import DashboardLayout from "./routes/UserDashboard/DashboardLayout";
-import { MainCharts } from "./components/dashboard/components/Charts/MainCharts";
-import { PostsTable } from "./components/dashboard/components/postTable";
-import DocumentsGuidePage from "./components/navbar/DocumentsGuidePage";
-import ContactPage from "./components/contacts/ContactPage";
+
+// ================= LAZY ROUTES (Code Splitting) =================
+const AdminRoute = lazy(() => import("./routes/AdminDashboard/AdminRoute"));
+const Page = lazy(() => import("./components/dashboard/page"));
+const UsersTable = lazy(() => import("./components/dashboard/components/UsersTable"));
+const MainCharts = lazy(() => import("./components/dashboard/components/Charts/MainCharts"));
+const PostsTable = lazy(() => import("./components/dashboard/components/postTable"));
+
+const DashboardLayout = lazy(() => import("./routes/UserDashboard/DashboardLayout"));
+const MyPostsPage = lazy(() => import("./routes/UserDashboard/MyPostPage"));
+const SavedPostsPage = lazy(() => import("./routes/UserDashboard/SavedPostsPage"));
+const EditPostPage = lazy(() => import("./routes/UserDashboard/EditPostPage"));
+const NewPostPage = lazy(() => import("./routes/UserDashboard/newPostPage"));
+
+const SinglePage = lazy(() => import("./routes/singlePage/singlePage"));
+const SignInPage = lazy(() => import("./routes/auth/signInPage"));
+const SignUpPage = lazy(() => import("./routes/auth/signUpPage"));
+const Account = lazy(() => import("./routes/account/Account"));
+const DocumentsGuidePage = lazy(() => import("./components/navbar/DocumentsGuidePage"));
+const ContactPage = lazy(() => import("./components/contacts/ContactPage"));
 
 // ================= PROTECTED WRAPPER =================
 function Protected({ children }) {
@@ -89,7 +93,7 @@ function App() {
         { path: "documents-guide", element: <DocumentsGuidePage /> },
             // صفحة التواصل — عامة، تطابق مسار "/contact" الموجود أصلاً في navLinks بالنافبار
         { path: "contact", element: <ContactPage /> },
- 
+  
         
         // ================= ACCOUNT (تمت حمايته هنا) =================
         {
@@ -102,7 +106,11 @@ function App() {
         },
       ],
     },
-  ]);
+  ], {
+    future: {
+      v7_startTransition: true,
+    },
+  });
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

@@ -62,5 +62,17 @@ export default defineConfig({
         secure: false,
       }
     }
+  },
+  build: {
+  rollupOptions: {
+    output: {
+      manualChunks: {
+        'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+        'ui-vendor': ['framer-motion', 'lucide-react'],
+        'map-vendor': ['leaflet', 'react-leaflet'], // Adjust based on your actual map library
+        'clerk-vendor': ['@clerk/clerk-react'],
+      }
+    }
   }
+}
 })
